@@ -45,7 +45,7 @@ function showBroker(item) {
     const description = document.createElement('dd'); description.textContent = value;
     fields.append(term, description);
   }
-  detail.hidden = false; detail.focus({preventScroll: true});
+  detail.hidden = false; detail.focus();
 }
 document.querySelector('#directory-search').addEventListener('submit', event => {
   event.preventDefault(); query = search.value.trim(); selectedRegion = region.value; offset = 0; loadBrokers();
