@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ceaseandquiet.com/schemas/broker-procedure-v0.json",
+  "title": "Privacy-redacted broker procedure intelligence",
+  "description": "A procedural observation, never a person or removal case record. No raw mailbox content or personal identifiers.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "brokerId", "observedOn", "sourceKind", "reviewStatus", "channel", "steps", "outcomeClaim"],
+  "properties": {
+    "schemaVersion": {"const": "0.1.0"},
+    "brokerId": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]{1,79}$"},
+    "observedOn": {"type": "string", "format": "date"},
+    "sourceKind": {"enum": ["owner-mailbox-redacted", "official-public-page", "broker-support-response"]},
+    "reviewStatus": {"enum": ["unreviewed", "needs-independent-verification", "independently-verified", "stale"]},
+    "channel": {"enum": ["email", "web-form", "account-portal", "postal-mail", "unknown"]},
+    "steps": {"type": "array", "minItems": 1, "maxItems": 12, "uniqueItems": true, "items": {"enum": ["submit-request", "acknowledgement", "confirm-email", "verify-identity", "verify-residence", "use-portal", "provide-record-url", "provide-limited-profile-fields", "wait-for-review", "follow-up", "manual-review"]}},
+    "requiredFieldCategories": {"type": "array", "uniqueItems": true, "items": {"enum": ["name", "email", "state-or-region", "record-url", "address", "phone", "government-id"]}},
+    "sensitiveProofRequested": {"type": "boolean"},
+    "outcomeClaim": {"enum": ["none", "receipt-only", "pending-verification", "needs-action", "no-record-found", "opt-out-processed", "deletion-claimed", "rejected", "unknown"]},
+    "independentlyRechecked": {"type": "boolean"},
+    "officialSourceUrl": {"type": "string", "format": "uri", "pattern": "^https://"},
+    "lastPublicVerificationOn": {"type": "string", "format": "date"}
+  },
+  "allOf": [
+    {"if": {"properties": {"reviewStatus": {"const": "independently-verified"}}}, "then": {"required": ["officialSourceUrl", "lastPublicVerificationOn"]}},
+    {"if": {"properties": {"steps": {"contains": {"const": "verify-identity"}}}}, "then": {"required": ["sensitiveProofRequested"]}}
+  ]
+}

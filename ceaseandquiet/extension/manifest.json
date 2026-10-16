@@ -1,0 +1,8 @@
+{
+  "manifest_version": 3,
+  "name": "Cease & Quiet Local Vault (Prototype)",
+  "version": "0.1.0",
+  "description": "Locally encrypted profile and explicit form fill for the Cease & Quiet preview.",
+  "permissions": ["storage", "activeTab", "scripting"],
+  "action": {"default_title": "Cease & Quiet Vault", "default_popup": "popup.html"}
+}

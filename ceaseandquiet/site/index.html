@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <title>Cease &amp; Quiet — privacy tools preview</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="site.js" defer></script>
+</head>
+<body>
+  <header class="shell nav"><a class="brand" href="#top"><span class="mark" aria-hidden="true">◇</span><span>Cease <em>&amp;</em> Quiet</span></a><nav aria-label="Primary"><a href="#directory">Broker directory</a><a href="#vault">Local vault</a><a href="#about">About</a></nav><span class="status">DEVELOPMENT PREVIEW</span></header>
+  <main id="top">
+    <section class="shell hero">
+      <p class="eyebrow"><span class="dot"></span> OPEN SOURCE PRIVACY DEFENSE</p>
+      <h1>Take control of the data<br><span class="gradient-text">brokers keep about you.</span></h1>
+      <p class="intro">Explore the broker directory and test a private, local form fill flow. This preview does not send removal requests or collect your details.</p>
+      <div class="actions"><a class="glow-button" href="#directory">Explore the directory <span aria-hidden="true">↗</span></a><a class="glow-button secondary" href="#vault">See the local vault</a></div>
+      <div class="metrics"><div><strong>723</strong><span>source directory records</span></div><div><strong>60</strong><span>verified-list records</span></div><div><strong>0</strong><span>requests sent by preview</span></div></div>
+    </section>
+    <section id="directory" class="shell section"><div class="section-heading"><div><p class="eyebrow">01 / DISCOVER</p><h2>Broker directory</h2></div><p>Source records are shown for research. Contact channels and removal procedures still need independent verification.</p></div><div class="panel"><label for="broker-search">Search broker name</label><div class="search-row"><input id="broker-search" type="search" maxlength="100" autocomplete="off" placeholder="Search by name"><button id="search-button" class="glow-button" type="button">Search</button></div><p id="directory-status" class="subtle" role="status">Loading directory…</p><ul id="broker-results" class="results"></ul></div></section>
+    <section id="vault" class="shell section"><div class="section-heading"><div><p class="eyebrow">02 / PREPARE</p><h2>Your details stay with you</h2></div><p>The Chrome extension prototype encrypts a small profile locally and fills this sample form only after you unlock it and click Fill.</p></div><div class="panel"><div class="notice">Local demo only. The form has no submit action and does not transmit or save its contents.</div><form id="cq-demo-form" autocomplete="off"><div class="form-grid"><label>First name<input name="givenName" autocomplete="off"></label><label>Last name<input name="familyName" autocomplete="off"></label><label>Email<input name="email" type="email" autocomplete="off"></label><label>State or region<input name="region" autocomplete="off"></label></div><button class="glow-button secondary" type="reset">Clear form</button></form></div></section>
+    <section id="about" class="shell section about"><p class="eyebrow">03 / PROJECT STATUS</p><h2>Built in careful stages.</h2><p>The directory API is read only. Broker procedures are being reviewed separately. Delivery, accounts, scans, and public personal data intake are not active in this preview.</p></section>
+  </main>
+  <footer class="shell footer"><span>Cease &amp; Quiet · development preview</span><span>Privacy starts with restraint.</span></footer>
+</body></html>
