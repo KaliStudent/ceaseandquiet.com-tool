@@ -9,6 +9,8 @@ const clearFields = () => { FIELDS.forEach(name => { $(name).value = ''; }); $('
 
 function render() {
   const open = session.snapshot() !== null;
+  // An action may observe expiry before the browser runs its delayed timer.
+  if (saved && !open) FIELDS.forEach(name => { $(name).value = ''; });
   $('profile-panel').hidden = saved && !open;
   $('unlock-panel').hidden = open;
   $('mode').textContent = open ? 'UNLOCKED · THIS POPUP ONLY' : saved ? 'ENCRYPTED · LOCKED' : 'CREATE YOUR LOCAL VAULT';

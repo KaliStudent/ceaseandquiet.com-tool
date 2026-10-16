@@ -69,3 +69,19 @@ test('hiding the popup clears visible fields; unavailable storage disables opera
     assert.ok(['save','unlock','fill','erase'].every(id => ui.elements[id].disabled));
   } finally { ui.close(); }
 });
+
+test('an expired session clears DOM values even before its delayed timer runs', async () => {
+  const ui = await popup();
+  const originalNow = Date.now;
+  try {
+    for (const [name,value] of Object.entries(profile)) ui.elements[name].value = value;
+    ui.elements.passphrase.value = password; await ui.click('save');
+    ui.elements.passphrase.value = password; await ui.click('unlock');
+    const advanced = originalNow() + 120001;
+    Date.now = () => advanced;
+    await ui.click('fill');
+    assert.ok(Object.keys(profile).every(name => ui.elements[name].value === ''));
+    assert.equal(ui.elements.fill.hidden, true);
+    assert.ok(ui.storage());
+  } finally { Date.now = originalNow; ui.close(); }
+});
