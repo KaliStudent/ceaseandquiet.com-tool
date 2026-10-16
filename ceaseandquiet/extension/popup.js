@@ -1,60 +1,86 @@
+import {FIELDS, encryptProfile, VaultSession} from './vault.mjs';
+import {fillPreview} from './fill.mjs';
+
 const $ = id => document.getElementById(id);
-const fields = ['givenName','familyName','email','region'];
-let unlocked = null;
-const encode = text => new TextEncoder().encode(text);
-const decode = bytes => new TextDecoder().decode(bytes);
-const b64 = bytes => btoa(String.fromCharCode(...new Uint8Array(bytes)));
-const unb64 = text => Uint8Array.from(atob(text), c => c.charCodeAt(0));
+const session = new VaultSession();
+let saved = false, busy = false, ready = false, lifecycle = 0, timer;
 const message = text => { $('state').textContent = text; };
-const profile = () => Object.fromEntries(fields.map(name => [name, $(name).value.trim()]));
-const show = data => fields.forEach(name => { $(name).value = data[name] || ''; });
-async function key(passphrase, salt) {
-  const material = await crypto.subtle.importKey('raw', encode(passphrase), 'PBKDF2', false, ['deriveKey']);
-  return crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:600000,hash:'SHA-256'},material,{name:'AES-GCM',length:256},false,['encrypt','decrypt']);
+const clearFields = () => { FIELDS.forEach(name => { $(name).value = ''; }); $('passphrase').value = ''; };
+
+function render() {
+  const open = session.snapshot() !== null;
+  $('profile-panel').hidden = saved && !open;
+  $('unlock-panel').hidden = open;
+  $('mode').textContent = open ? 'UNLOCKED · THIS POPUP ONLY' : saved ? 'ENCRYPTED · LOCKED' : 'CREATE YOUR LOCAL VAULT';
+  $('save').hidden = saved;
+  $('unlock').hidden = !saved || open;
+  $('fill').hidden = !open;
+  $('lock').hidden = !open;
+  $('erase').hidden = !saved;
+  for (const id of ['save', 'unlock', 'fill', 'erase']) $(id).disabled = busy || !ready;
+  for (const name of FIELDS) $(name).readOnly = open;
 }
+
+function lock(text = 'Vault locked. Revealed fields cleared.') {
+  lifecycle++; clearTimeout(timer); session.lock(); clearFields(); render(); message(text);
+}
+
 async function save() {
-  if ($('passphrase').value.length < 12) { message('Use a passphrase of at least 12 characters.'); return; }
-  const data = profile();
-  if (!data.givenName || !data.familyName || !data.email) { message('First name, last name and email are required.'); return; }
-  const salt = crypto.getRandomValues(new Uint8Array(16));
-  const iv = crypto.getRandomValues(new Uint8Array(12));
-  const secret = await key($('passphrase').value,salt);
-  const ciphertext = await crypto.subtle.encrypt({name:'AES-GCM',iv},secret,encode(JSON.stringify(data)));
-  await chrome.storage.local.set({vault:{version:1,kdf:'PBKDF2-SHA256',iterations:600000,cipher:'AES-256-GCM',salt:b64(salt),iv:b64(iv),ciphertext:b64(ciphertext)}});
-  unlocked = data; $('passphrase').value = ''; message('Encrypted vault saved locally.');
+  const profile = Object.fromEntries(FIELDS.map(name => [name, $(name).value]));
+  const envelope = await encryptProfile(profile, $('passphrase').value);
+  await chrome.storage.local.set({vault: envelope});
+  saved = true;
+  lock('Vault encrypted and saved on this device. Unlock to fill.');
 }
+
 async function unlock() {
-  const {vault} = await chrome.storage.local.get('vault');
-  if (!vault || vault.version !== 1) { message('No compatible vault saved.'); return; }
+  const passphrase = $('passphrase').value;
+  clearFields(); session.lock();
+  const generation = lifecycle;
   try {
-    const secret = await key($('passphrase').value,unb64(vault.salt));
-    unlocked = JSON.parse(decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:unb64(vault.iv)},secret,unb64(vault.ciphertext))));
-    show(unlocked); $('passphrase').value = ''; message('Unlocked for this popup session.');
-  } catch { unlocked = null; message('Could not unlock. Check your passphrase.'); }
+    const {vault} = await chrome.storage.local.get('vault');
+    if (generation !== lifecycle) return;
+    if (!vault) { saved = false; throw new Error('No vault is saved.'); }
+    await session.unlock(vault, passphrase);
+    if (generation !== lifecycle) { session.lock(); return; }
+    const profile = session.snapshot();
+    if (!profile) return;
+    FIELDS.forEach(name => { $(name).value = profile[name]; });
+    timer = setTimeout(() => lock('Vault locked after two minutes.'), 120000);
+    message('Unlocked for up to two minutes. Check the details before filling.');
+  } catch { lock('Could not unlock. Check the passphrase. Older prototype vaults must be erased and recreated.'); }
 }
+
 async function fill() {
-  if (!unlocked) { message('Unlock the vault first.'); return; }
-  const [tab] = await chrome.tabs.query({active:true,currentWindow:true});
-  if (!tab?.url) { message('Open the Cease & Quiet preview form first.'); return; }
-  const url = new URL(tab.url);
-  if (!['https://ceaseandquiet.com','http://127.0.0.1:8787'].includes(url.origin)) { message('This page is not an approved preview origin.'); return; }
-  const injection = await chrome.scripting.executeScript({target:{tabId:tab.id},func:data=>{
-    const form = document.querySelector('#cq-demo-form');
-    if (!form) return false;
-    for (const [name,value] of Object.entries(data)) {
-      const input = form.elements.namedItem(name);
-      if (!(input instanceof HTMLInputElement)) return false;
-      input.value = value;
-      input.dispatchEvent(new Event('input',{bubbles:true}));
-    }
-    return true;
-  },args:[unlocked]});
-  message(injection[0]?.result ? 'Filled the local preview form. Nothing was submitted.' : 'Preview form not found.');
+  await fillPreview(chrome, () => session.snapshot());
+  const eraseAfter = $('erase-after').checked;
+  // Always lock after a successful fill, including when local deletion fails.
+  lock('Form filled locally. Nothing was submitted.');
+  if (eraseAfter) {
+    try { await chrome.storage.local.remove('vault'); saved = false; message('Form filled. Saved vault erased. Clear the page when finished.'); }
+    catch { message('Form filled, but saved vault deletion failed. Use Erase vault to retry.'); }
+  }
 }
+
 async function erase() {
-  await chrome.storage.local.remove('vault');
-  unlocked = null; show({}); $('passphrase').value = '';
-  message('Saved vault deleted from extension storage.');
+  lock(); await chrome.storage.local.remove('vault'); saved = false;
+  message('Saved vault erased. Copies already filled into a page must be cleared there.');
 }
-for (const [id,fn] of [['save',save],['unlock',unlock],['fill',fill],['erase',erase]]) $(id).addEventListener('click',()=>fn().catch(()=>message('Action failed. No form was submitted.')));
-chrome.storage.local.get('vault').then(({vault})=>message(vault?'Vault saved. Enter passphrase to unlock.':'No vault saved. Enter details and encrypt.'));
+
+for (const [id, action] of [['save', save], ['unlock', unlock], ['fill', fill], ['erase', erase]]) $(id).addEventListener('click', async () => {
+  if (busy || !ready) return;
+  busy = true; render();
+  try { await action(); }
+  catch (error) { message(error.message || 'Action failed. Please try again.'); }
+  finally { $('passphrase').value = ''; busy = false; render(); }
+});
+$('lock').addEventListener('click', () => lock());
+window.addEventListener('pagehide', () => lock());
+document.addEventListener('visibilitychange', () => { if (document.hidden) lock(); });
+
+try {
+  await chrome.storage.local.setAccessLevel({accessLevel: 'TRUSTED_CONTEXTS'});
+  const {vault} = await chrome.storage.local.get('vault'); saved = Boolean(vault); ready = true;
+  message(saved ? 'Vault saved on this device. Enter your passphrase to unlock.' : 'Use sample details during beta testing. Choose a unique passphrase.');
+} catch { message('Local storage is unavailable. The vault is disabled.'); }
+render();

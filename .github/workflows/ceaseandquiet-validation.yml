@@ -25,3 +25,11 @@ jobs:
         run: go test -count=1 ./internal/broker/...
       - name: Validate embedded broker lists
         run: go run ./cmd/eraser validate-brokers
+      - name: Test read-only beta boundaries
+        run: go test -count=1 ./internal/readonlyapi/... ./internal/preview/... ./cmd/cq-preview/...
+      - name: Install Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test vault and form fill lifecycle
+        run: node --test ceaseandquiet/tests/*.test.mjs

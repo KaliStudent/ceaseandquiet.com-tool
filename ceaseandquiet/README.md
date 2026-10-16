@@ -1,18 +1,25 @@
-# Cease & Quiet staged prototype
+# Cease & Quiet local beta candidate
 
-This folder is isolated from the upstream Eraser docs site and command line send flow. It is not a production service.
+This candidate provides a local broker directory and an encrypted Chrome vault for a sample form. It is staged for the owner's final review.
 
-## Local preview
+## Run from source
 
-Run `go run ./cmd/cq-preview` from the repository root and open `http://127.0.0.1:8787`. The Go process serves the static site and two **GET-only** broker metadata endpoints:
+From the repository root, run go run ./cmd/cq-preview and open http://127.0.0.1:8787/. The Go process binds only to loopback, serves embedded allowlisted assets, rejects unexpected Host headers, and prevents form submission through browser CSP. No profile data is accepted.
 
-- `/api/v1/brokers?limit=25&q=name`
-- `/api/v1/brokers/{id}`
+GET /api/v1/brokers supports q, region (us/eu/global), limit (1–100), and offset. Responses provide public metadata, total count, and paging state. GET /api/v1/brokers/{id} returns one record. Contact channels remain unreviewed and are omitted.
 
-The API reads the embedded broker list, not local profiles or a user's edited broker file. It omits contact addresses and opt-out links until independently reviewed. It has no sender, mail configuration, profile, or history code. The preview binds to loopback by default; do not expose it publicly without separate authentication, rate limiting, deployment review, and privacy review.
+## Load the extension
 
-## Chrome extension
+Use a clean development Chrome profile. Load ceaseandquiet/extension as an unpacked MV3 extension. Use sample details and a unique test passphrase. The candidate fills only the empty marked form at http://127.0.0.1:8787/. It has no production origin access and never submits the form.
 
-Load `ceaseandquiet/extension` as an unpacked Manifest V3 extension in a development Chrome profile. The popup encrypts a limited profile with PBKDF2-SHA256 (600,000 iterations) and AES-256-GCM before saving ciphertext in `chrome.storage.local`. It requests only storage, activeTab, and scripting permissions. A user must unlock and click Fill on the preview page. It fills the form and never submits it. Erase deletes the extension's saved ciphertext; copies already placed in page fields, browser sync/backups, and process memory are outside that deletion claim.
+Version 0.2.0 uses a new authenticated envelope format. Older prototype vaults must be erased and recreated. The vault locks after save, after successful fill, on close/hide, after a failed unlock, or after two minutes. Erase saved vault after successful fill is selected by default. Clearing the popup or deleting saved ciphertext cannot recall values already transferred into a page.
 
-The extension is an early prototype. It has not had a security audit and should use synthetic test details until that review is complete. Public intake, broker email delivery, scans, account management, and DNS/VPS work are outside this branch.
+## Review and rollout
+
+See SECURITY-REVIEW.md for data flow, safeguards, evidence, limitations, and review focus. Complete BETA-CHECKLIST.md in actual Chrome. Follow ROLLOUT.md for the owner's final review and beta release.
+
+The native Chrome installation and permissions flow remains unverified until that checklist is completed; module tests use simulated Chrome APIs. This is a beta candidate, not a production security claim.
+
+## Package on Windows
+
+Run ceaseandquiet/scripts/package-beta.ps1 -OutputDirectory <absolute output directory>. It builds a trimmed local preview executable, copies only the required extension files and review documents, records the source commit and working-tree state, then creates a ZIP and checksum. It refuses to package a dirty checkout.

@@ -56,6 +56,20 @@ func respond(w http.ResponseWriter, status int, v any) {
 
 func (a *API) list(w http.ResponseWriter, r *http.Request) {
 	limit := 25
+	offset := 0
+	if raw := r.URL.Query().Get("offset"); raw != "" {
+		n, err := strconv.Atoi(raw)
+		if err != nil || n < 0 || n > len(a.items) {
+			respond(w, 400, map[string]string{"error": "invalid offset"})
+			return
+		}
+		offset = n
+	}
+	region := r.URL.Query().Get("region")
+	if region != "" && region != "us" && region != "eu" && region != "global" {
+		respond(w, 400, map[string]string{"error": "invalid region"})
+		return
+	}
 	if raw := r.URL.Query().Get("limit"); raw != "" {
 		n, err := strconv.Atoi(raw)
 		if err != nil || n < 1 || n > 100 {
@@ -70,16 +84,20 @@ func (a *API) list(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	items := make([]Item, 0, limit)
+	total := 0
 	for _, item := range a.items {
+		if region != "" && item.Region != region {
+			continue
+		}
 		if query != "" && !strings.Contains(strings.ToLower(item.Name), query) {
 			continue
 		}
-		items = append(items, item)
-		if len(items) == limit {
-			break
+		if total >= offset && len(items) < limit {
+			items = append(items, item)
 		}
+		total++
 	}
-	respond(w, 200, map[string]any{"items": items, "count": len(items), "notice": "Directory entries and contact channels have not been independently verified."})
+	respond(w, 200, map[string]any{"items": items, "count": len(items), "total": total, "offset": offset, "hasMore": offset+len(items) < total, "notice": "Directory entries and contact channels have not been independently verified."})
 }
 
 func (a *API) one(w http.ResponseWriter, r *http.Request) {

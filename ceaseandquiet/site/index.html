@@ -4,23 +4,60 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="referrer" content="no-referrer">
-  <title>Cease &amp; Quiet — privacy tools preview</title>
+  <title>Cease &amp; Quiet — your local privacy toolkit</title>
   <link rel="stylesheet" href="styles.css">
   <script src="site.js" defer></script>
 </head>
 <body>
-  <header class="shell nav"><a class="brand" href="#top"><span class="mark" aria-hidden="true">◇</span><span>Cease <em>&amp;</em> Quiet</span></a><nav aria-label="Primary"><a href="#directory">Broker directory</a><a href="#vault">Local vault</a><a href="#about">About</a></nav><span class="status">DEVELOPMENT PREVIEW</span></header>
+  <a class="skip" href="#directory">Skip to broker directory</a>
+  <header class="shell nav">
+    <a class="brand" href="#top"><span class="mark" aria-hidden="true">◇</span>Cease <em>&amp;</em> Quiet</a>
+    <nav aria-label="Primary"><a href="#directory">Broker directory</a><a href="#vault">Local vault</a><a href="#setup">Get started</a></nav>
+    <span class="status">LOCAL BETA</span>
+  </header>
   <main id="top">
     <section class="shell hero">
       <p class="eyebrow"><span class="dot"></span> OPEN SOURCE PRIVACY DEFENSE</p>
-      <h1>Take control of the data<br><span class="gradient-text">brokers keep about you.</span></h1>
-      <p class="intro">Explore the broker directory and test a private, local form fill flow. This preview does not send removal requests or collect your details.</p>
-      <div class="actions"><a class="glow-button" href="#directory">Explore the directory <span aria-hidden="true">↗</span></a><a class="glow-button secondary" href="#vault">See the local vault</a></div>
-      <div class="metrics"><div><strong>723</strong><span>source directory records</span></div><div><strong>60</strong><span>verified-list records</span></div><div><strong>0</strong><span>requests sent by preview</span></div></div>
+      <h1>Less exposure.<br><span class="gradient-text">More control.</span></h1>
+      <p class="intro">Explore the companies that trade in personal data. Prepare your details in a vault that stays on your device, and choose when to reveal them.</p>
+      <div class="actions"><a class="glow-button" href="#directory">Explore the directory <span aria-hidden="true">↗</span></a><a class="glow-button secondary" href="#vault">Try the local vault</a></div>
+      <p class="hero-note">This beta uses sample details. Removal requests and exposure scans are not active.</p>
+      <div class="metrics"><div><strong>723</strong><span>broker directory records</span></div><div><strong>On device</strong><span>encrypted profile storage</span></div><div><strong>Your choice</strong><span>unlock · fill · erase</span></div></div>
     </section>
-    <section id="directory" class="shell section"><div class="section-heading"><div><p class="eyebrow">01 / DISCOVER</p><h2>Broker directory</h2></div><p>Source records are shown for research. Contact channels and removal procedures still need independent verification.</p></div><div class="panel"><label for="broker-search">Search broker name</label><div class="search-row"><input id="broker-search" type="search" maxlength="100" autocomplete="off" placeholder="Search by name"><button id="search-button" class="glow-button" type="button">Search</button></div><p id="directory-status" class="subtle" role="status">Loading directory…</p><ul id="broker-results" class="results"></ul></div></section>
-    <section id="vault" class="shell section"><div class="section-heading"><div><p class="eyebrow">02 / PREPARE</p><h2>Your details stay with you</h2></div><p>The Chrome extension prototype encrypts a small profile locally and fills this sample form only after you unlock it and click Fill.</p></div><div class="panel"><div class="notice">Local demo only. The form has no submit action and does not transmit or save its contents.</div><form id="cq-demo-form" autocomplete="off"><div class="form-grid"><label>First name<input name="givenName" autocomplete="off"></label><label>Last name<input name="familyName" autocomplete="off"></label><label>Email<input name="email" type="email" autocomplete="off"></label><label>State or region<input name="region" autocomplete="off"></label></div><button class="glow-button secondary" type="reset">Clear form</button></form></div></section>
-    <section id="about" class="shell section about"><p class="eyebrow">03 / PROJECT STATUS</p><h2>Built in careful stages.</h2><p>The directory API is read only. Broker procedures are being reviewed separately. Delivery, accounts, scans, and public personal data intake are not active in this preview.</p></section>
+    <section id="directory" class="shell section">
+      <div class="section-heading"><div><p class="eyebrow">01 / DISCOVER</p><h2>Know the landscape.</h2></div><p>Browse the source directory. A listing does not mean a broker holds your data, and its removal channel still needs review.</p></div>
+      <div class="panel">
+        <form id="directory-search" class="search-row" role="search">
+          <label class="search-label" for="broker-search">Broker name<input id="broker-search" type="search" maxlength="100" autocomplete="off" placeholder="Search by name"></label>
+          <label for="region-filter">Region<select id="region-filter"><option value="">All regions</option><option value="us">US</option><option value="eu">EU</option><option value="global">Global</option></select></label>
+          <button class="glow-button" type="submit">Search</button>
+        </form>
+        <p id="directory-status" class="subtle" role="status" aria-live="polite">Loading directory…</p>
+        <ul id="broker-results" class="results" aria-label="Broker results"></ul>
+        <div class="pagination"><button id="previous" class="glow-button secondary" type="button" disabled>Previous</button><span id="page-label" class="subtle"></span><button id="next" class="glow-button secondary" type="button" disabled>Next</button></div>
+      </div>
+      <section id="broker-detail" class="panel broker-detail" aria-label="Selected broker" hidden tabindex="-1">
+        <p class="eyebrow">DIRECTORY RECORD</p><h3 id="detail-name"></h3><dl id="detail-fields"></dl>
+        <p class="subtle">No personal data search has been performed. Contact details and instructions will appear after procedure review.</p>
+        <button id="close-detail" class="glow-button secondary" type="button">Close details</button>
+      </section>
+    </section>
+    <section id="vault" class="shell section">
+      <div class="section-heading"><div><p class="eyebrow">02 / PREPARE</p><h2>Private by choice.</h2></div><p>Your Chrome vault stores an encrypted profile locally. Unlock it only when you are ready to fill the preview.</p></div>
+      <div class="steps"><article><span>01</span><h3>Save on your device</h3><p>Choose a unique passphrase. The vault saves an encrypted copy of your sample profile.</p></article><article><span>02</span><h3>Unlock when ready</h3><p>Open the extension on this page and unlock. It locks again when closed or after two minutes.</p></article><article><span>03</span><h3>Fill, then clear</h3><p>Click Fill preview form. The popup locks, and you can erase the saved vault with the same action.</p></article></div>
+      <div class="panel preview-panel">
+        <div class="notice"><strong>Practice with sample details.</strong> This local form never submits. Values clear when you leave the page or after two minutes.</div>
+        <form id="cq-demo-form" data-cq-preview="v1" autocomplete="off">
+          <div class="form-grid"><label>First name<input name="givenName" maxlength="100" autocomplete="off" spellcheck="false"></label><label>Last name<input name="familyName" maxlength="100" autocomplete="off" spellcheck="false"></label><label>Email<input name="email" type="email" maxlength="254" autocomplete="off" spellcheck="false"></label><label>State or region<input name="region" maxlength="100" autocomplete="off" spellcheck="false"></label></div>
+          <div class="form-footer"><button class="glow-button secondary" type="reset">Clear form</button><p id="form-status" class="subtle" role="status">Ready for a local fill. Nothing will be submitted.</p></div>
+        </form>
+      </div>
+    </section>
+    <section id="setup" class="shell section setup">
+      <div><p class="eyebrow">03 / GET STARTED</p><h2>A small, private beta.</h2><p>The beta package includes the local preview and unpacked Chrome extension. Use synthetic details while the final review is pending.</p></div>
+      <details class="panel"><summary>Set up the local beta</summary><ol><li>Extract the beta package and start <strong>cq-preview.exe</strong> from its preview folder.</li><li>Open <strong>http://127.0.0.1:8787</strong> in Chrome.</li><li>Open <strong>chrome://extensions</strong>, enable Developer mode, choose Load unpacked, and select the package's extension folder.</li><li>Open the extension. Try a sample profile such as Taylor Example and taylor@example.test, with a unique test passphrase.</li><li>Encrypt and save, unlock, then fill the empty preview form. Clear the form when finished.</li></ol><p class="subtle">There is no passphrase recovery. Older prototype vaults must be erased and recreated. The extension fills only this local beta page.</p></details>
+    </section>
   </main>
-  <footer class="shell footer"><span>Cease &amp; Quiet · development preview</span><span>Privacy starts with restraint.</span></footer>
-</body></html>
+  <footer class="shell footer"><span>Cease &amp; Quiet · local beta candidate</span><span>Final security review pending</span></footer>
+</body>
+</html>
