@@ -26,7 +26,7 @@ jobs:
       - name: Validate embedded broker lists
         run: go run ./cmd/eraser validate-brokers
       - name: Test read-only beta boundaries
-        run: go test -count=1 ./internal/readonlyapi/... ./internal/preview/... ./cmd/cq-preview/...
+        run: go test -count=1 ./internal/readonlyapi/... ./internal/preview/... ./internal/staging/... ./cmd/cq-preview/... ./cmd/cq-staging/...
       - name: Install Node
         uses: actions/setup-node@v4
         with:
