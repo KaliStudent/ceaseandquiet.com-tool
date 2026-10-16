@@ -48,7 +48,9 @@ Go tests cover pagination/filtering, read-only methods, no contact fields, loopb
 
 The in-app browser was used to verify the local website, search, pagination, record details, empty results, clear form, and a 390-pixel mobile viewport without horizontal overflow.
 
-**Actual unpacked extension installation, popup behavior, activeTab permission grant, and document-ID injection in Chrome remain to be verified.** No Chrome browser connection is available to this chat. Complete BETA-CHECKLIST.md in a clean Chrome development profile before claiming the extension is beta-ready.
+The owner loaded the unpacked extension in Windows Chrome 155.0.8059.84. Native checks passed for save/lock, reopening, wrong-passphrase rejection, unlock, local form fill, default ciphertext deletion, retained ciphertext when deletion is unselected, and the two-minute popup lock. The real fill exercised the activeTab/scripting path and document-ID targeting. See NATIVE-CHROME-RESULTS.md for the tested commit and precise scope.
+
+These checks used an existing Chrome profile. The clean-profile checklist, additional native rejection/race checks, and the owner's final security review remain open. Simulated tests cover several of these failure paths; they do not replace the remaining browser checks.
 
 ## Review focus for the owner's final tools/team
 

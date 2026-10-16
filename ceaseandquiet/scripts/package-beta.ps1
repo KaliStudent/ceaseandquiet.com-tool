@@ -15,13 +15,13 @@ try {
     foreach ($file in @('manifest.json','popup.html','popup.css','popup.js','vault.mjs','fill.mjs')) {
         Copy-Item -LiteralPath (Join-Path $repoRoot ('ceaseandquiet/extension/' + $file)) -Destination $extensionDirectory.FullName
     }
-    foreach ($file in @('README.md','SECURITY-REVIEW.md','BETA-CHECKLIST.md','ROLLOUT.md')) {
+    foreach ($file in @('README.md','SECURITY-REVIEW.md','BETA-CHECKLIST.md','NATIVE-CHROME-RESULTS.md','ROLLOUT.md')) {
         Copy-Item -LiteralPath (Join-Path $repoRoot ('ceaseandquiet/' + $file)) -Destination $packageRoot
     }
     Copy-Item -LiteralPath (Join-Path $repoRoot 'LICENSE') -Destination $packageRoot
     & go build -trimpath -ldflags='-s -w' -o (Join-Path $previewDirectory.FullName 'cq-preview.exe') ./cmd/cq-preview
     if ($LASTEXITCODE -ne 0) { throw 'Preview build failed.' }
-    @{ version='0.2.0'; sourceCommit=$revision; workingTree='clean'; target='windows-local-beta'; nativeChromeChecklist='pending'; finalReview='pending' } | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $packageRoot 'package-manifest.json') -Encoding utf8
+    @{ version='0.2.0'; sourceCommit=$revision; workingTree='clean'; target='windows-local-beta'; nativeChromeSmoke='passed-see-NATIVE-CHROME-RESULTS.md'; nativeChromeChecklist='pending'; finalReview='pending' } | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $packageRoot 'package-manifest.json') -Encoding utf8
     $zipPath = Join-Path $OutputDirectory ($packageName + '.zip')
     if (Test-Path -LiteralPath $zipPath) { throw 'ZIP already exists.' }
     Compress-Archive -LiteralPath $packageRoot -DestinationPath $zipPath

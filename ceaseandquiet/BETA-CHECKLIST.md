@@ -2,6 +2,8 @@
 
 Use a new Chrome development profile and synthetic details. Use the package manifest's source commit for final review.
 
+This is a reusable acceptance checklist. Partial execution in an existing profile is recorded separately in NATIVE-CHROME-RESULTS.md; unchecked boxes below do not mean those recorded checks failed.
+
 ## Install and open
 
 - [ ] Extract the package. Start preview/cq-preview.exe and open http://127.0.0.1:8787/ in Chrome.

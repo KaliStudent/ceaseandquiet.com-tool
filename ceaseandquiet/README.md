@@ -18,7 +18,7 @@ Version 0.2.0 uses a new authenticated envelope format. Older prototype vaults m
 
 See SECURITY-REVIEW.md for data flow, safeguards, evidence, limitations, and review focus. Complete BETA-CHECKLIST.md in actual Chrome. Follow ROLLOUT.md for the owner's final review and beta release.
 
-The native Chrome installation and permissions flow remains unverified until that checklist is completed; module tests use simulated Chrome APIs. This is a beta candidate, not a production security claim.
+Core native Chrome vault and fill checks passed in an existing Windows Chrome profile; see NATIVE-CHROME-RESULTS.md. The complete clean-profile checklist and final security review remain pending. Module tests also exercise failure paths using simulated Chrome APIs. This is a beta candidate, not a production security claim.
 
 ## Package on Windows
 
