@@ -1,0 +1,27 @@
+name: CeaseAndQuiet broker validation
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  broker-validation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Install Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+          cache: true
+      - name: Run broker unit tests
+        run: go test -count=1 ./internal/broker/...
+      - name: Validate embedded broker lists
+        run: go run ./cmd/eraser validate-brokers
