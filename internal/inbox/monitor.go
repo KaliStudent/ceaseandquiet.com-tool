@@ -426,14 +426,14 @@ func (m *Monitor) WatchForNewEmails(ctx context.Context, callback func(Email)) e
 		select {
 		case <-ctx.Done():
 			close(stop)
-			<-idleDone // wait for the Idle() goroutine to actually exit before
+			_ = <-idleDone // wait for the Idle() goroutine to actually exit before
 			// this function returns, so the caller doesn't touch m.client
 			// concurrently with the IMAP connection still being in use
 			return ctx.Err()
 		case <-newMail:
 			log.Printf("New mail detected")
 			close(stop)
-			<-idleDone
+			_ = <-idleDone // Deliberate stop: wait for completion before fetching.
 
 			emails, err := m.FetchBrokerEmails(ctx, 1)
 			if err != nil {
