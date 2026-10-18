@@ -6,9 +6,12 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"os"
 	"time"
 
+	cqassets "github.com/drumandbytes/eraser/ceaseandquiet"
 	previewsite "github.com/drumandbytes/eraser/ceaseandquiet/site"
+	"github.com/drumandbytes/eraser/internal/addressapi"
 	"github.com/drumandbytes/eraser/internal/readonlyapi"
 )
 
@@ -23,8 +26,15 @@ func New(addr string) (http.Handler, error) {
 	}
 	mux := http.NewServeMux()
 	mux.Handle("/api/", api.Handler())
-	for _, name := range []string{"index.html", "styles.css", "site.js"} {
-		content, err := previewsite.Files.ReadFile(name)
+	mux.Handle("/api/v1/address-suggestions", addressapi.New(os.Getenv("CQ_GEOAPIFY_API_KEY")))
+	for _, name := range []string{"index.html", "styles.css", "site.js", "address.mjs"} {
+		var content []byte
+		var err error
+		if name == "address.mjs" {
+			content, err = cqassets.Files.ReadFile("extension/address.mjs")
+		} else {
+			content, err = previewsite.Files.ReadFile(name)
+		}
 		if err != nil {
 			return nil, err
 		}
@@ -55,7 +65,8 @@ func New(addr string) (http.Handler, error) {
 			http.Error(w, "unexpected host", http.StatusMisdirectedRequest)
 			return
 		}
-		if r.Method != http.MethodGet && r.Method != http.MethodHead {
+		addressLookup := r.URL.Path == "/api/v1/address-suggestions" && r.Method == http.MethodPost
+		if r.Method != http.MethodGet && r.Method != http.MethodHead && !addressLookup {
 			w.Header().Set("Allow", "GET, HEAD")
 			http.Error(w, "read-only preview", http.StatusMethodNotAllowed)
 			return

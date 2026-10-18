@@ -4,9 +4,9 @@ Status: **candidate for final review; synthetic details only**. Final review wil
 
 ## What the candidate does
 
-The loopback preview serves embedded static assets and public broker metadata. The MV3 popup encrypts four profile fields on device, unlocks for at most two minutes, fills the exact local sample form after an explicit click, then locks. The user can choose to delete saved ciphertext after successful fill (selected by default).
+The loopback preview serves embedded static assets and public broker metadata. The MV3 popup encrypts nine profile fields on device, unlocks for at most two minutes, fills the exact local sample form after an explicit click, then locks. The user can choose to delete saved ciphertext after successful fill (selected by default).
 
-There is no server profile intake, form submission, SMTP, scan, background extension worker, telemetry, remote script, sync storage, or external messaging in this flow. The upstream Eraser CLI retains its existing send functionality; this separate preview does not invoke or import its sender.
+There is no server profile intake, form submission, SMTP, scan, background extension worker, telemetry, remote script, sync storage, or broker messaging in this flow. Optional address lookup is described below. The upstream Eraser CLI retains its existing send functionality; this separate preview does not invoke or import its sender.
 
 ## Data and trust boundaries
 
@@ -65,3 +65,7 @@ Review the same commit independently, then reconcile findings:
 - Whether any logs, errors, artifacts, or directory output expose personal details.
 
 Record a reproducible path for every finding and severity. Fixes produce a new commit and rerun the relevant checks; reviewers should recheck that commit. A passing automated scan is one source of evidence, not a guarantee that a privacy design is correct.
+
+## Version 0.4.0 address lookup boundary
+
+Optional address suggestions introduce a narrowly scoped JSON POST endpoint. Only a partial address is accepted and forwarded to Geoapify after the user opts in. No full profile or passphrase is accepted. The provider key stays server-side. See ADDRESS-AUTOCOMPLETE.md for consent, origins, limits, failure behavior, and remaining provider/native checks. Earlier statements about no profile intake still apply; earlier read-only method descriptions refer to broker APIs and now exclude this address-only lookup route.

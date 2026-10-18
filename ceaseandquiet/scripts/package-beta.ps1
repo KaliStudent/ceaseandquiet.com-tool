@@ -14,10 +14,10 @@ try {
     New-Item -ItemType Directory -Path $packageRoot | Out-Null
     $extensionDirectory = New-Item -ItemType Directory -Path (Join-Path $packageRoot 'extension')
     $previewDirectory = New-Item -ItemType Directory -Path (Join-Path $packageRoot 'preview')
-    foreach ($file in @('manifest.json','popup.html','popup.css','popup.js','vault.mjs','fill.mjs')) {
+    foreach ($file in @('manifest.json','popup.html','popup.css','popup.js','vault.mjs','fill.mjs','address.mjs')) {
         Copy-Item -LiteralPath (Join-Path $repoRoot ('ceaseandquiet/extension/' + $file)) -Destination $extensionDirectory.FullName
     }
-    foreach ($file in @('README.md','SECURITY-REVIEW.md','BETA-CHECKLIST.md','STAGING-CHECKLIST.md','NATIVE-CHROME-RESULTS.md','ROLLOUT.md')) {
+    foreach ($file in @('README.md','SECURITY-REVIEW.md','BETA-CHECKLIST.md','STAGING-CHECKLIST.md','ADDRESS-AUTOCOMPLETE.md','NATIVE-CHROME-RESULTS.md','ROLLOUT.md')) {
         Copy-Item -LiteralPath (Join-Path $repoRoot ('ceaseandquiet/' + $file)) -Destination $packageRoot
     }
     Copy-Item -LiteralPath (Join-Path $repoRoot 'LICENSE') -Destination $packageRoot

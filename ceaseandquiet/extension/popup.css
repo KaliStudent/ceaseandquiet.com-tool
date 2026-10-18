@@ -13,8 +13,13 @@ label { display: block; margin-top: 13px; color: #cfd8e7; font-size: 12px; font-
 input { width: 100%; margin-top: 6px; padding: 10px; background: #1c1d22; border: 1px solid #2e3440; border-radius: 6px; color: #fff; font: 14px system-ui; }
 input:focus-visible { outline: 2px solid #0091ff; }
 input[readonly] { color: #cfd8e7; }
-.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; }
+.grid input { min-width: 0; }
+.address-results { list-style: none; padding: 0; margin: 10px 0; }
+.address-results li { margin: 6px 0; }
+.address-results button { width: 100%; text-align: left; white-space: normal; }
 .hint,.fine { color: #9ba0ab; font-size: 11px; font-weight: 400; line-height: 1.5; }
+.hint a { color: #cfd8e7; }
 .check { display: flex; align-items: center; gap: 8px; margin: 18px 0; font-weight: 400; }
 .check input { width: 16px; height: 16px; padding: 0; margin: 0; accent-color: #c3ff00; }
 .buttons { display: flex; flex-wrap: wrap; gap: 10px; }

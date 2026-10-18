@@ -1,11 +1,20 @@
 import {FIELDS, encryptProfile, VaultSession} from './vault.mjs';
 import {fillPreview} from './fill.mjs';
+import {attachAddressSuggestions, lookupAddressOnPage} from './address.mjs';
 
 const $ = id => document.getElementById(id);
 const session = new VaultSession();
 let saved = false, busy = false, ready = false, lifecycle = 0, timer;
 const message = text => { $('state').textContent = text; };
 const clearFields = () => { FIELDS.forEach(name => { $(name).value = ''; }); $('passphrase').value = ''; };
+const suggestions = attachAddressSuggestions({address: $('address'), city: $('city'), region: $('region'), postalCode: $('postalCode'), enabled: $('address-enabled'), results: $('address-results'), status: $('address-status'), lookup: async text => {
+  const [tab] = await chrome.tabs.query({active: true, currentWindow: true});
+  const url = new URL(tab?.url);
+  if (!tab?.id || !['http://127.0.0.1:8787', 'https://abcw.xyz:8443'].includes(url.origin) || url.pathname !== '/' || url.search || url.username || url.password) throw new Error('Open the approved preview page.');
+  const [result] = await chrome.scripting.executeScript({target: {tabId: tab.id, frameIds: [0]}, func: lookupAddressOnPage, args: [text]});
+  if (!Array.isArray(result?.result)) throw new Error('Suggestions unavailable');
+  return result.result;
+}});
 
 function render() {
   const open = session.snapshot() !== null;
@@ -24,10 +33,11 @@ function render() {
 }
 
 function lock(text = 'Vault locked. Revealed fields cleared.') {
-  lifecycle++; clearTimeout(timer); session.lock(); clearFields(); render(); message(text);
+  lifecycle++; clearTimeout(timer); suggestions.clear(); $('address-enabled').checked = false; session.lock(); clearFields(); render(); message(text);
 }
 
 async function save() {
+  suggestions.clear();
   const profile = Object.fromEntries(FIELDS.map(name => [name, $(name).value]));
   const envelope = await encryptProfile(profile, $('passphrase').value);
   await chrome.storage.local.set({vault: envelope});

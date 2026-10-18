@@ -64,6 +64,12 @@ dt { color: #9ba0ab; } dd { margin: 0; }
 .notice strong { display: block; color: #f4f4f5; margin-bottom: 4px; }
 .form-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 18px; margin-bottom: 22px; }
 .form-footer .subtle { max-width: 400px; margin: 0; }
+.address-opt-in { display: flex; align-items: center; gap: 10px; }
+.address-opt-in input { width: 16px; height: 16px; margin: 0; accent-color: #c3ff00; }
+.address-results { list-style: none; padding: 0; margin: 12px 0 20px; }
+.address-results li { margin: 7px 0; }
+.address-results button { width: 100%; text-align: left; color: #fff; background: transparent; border: 1px solid #0091ff; border-radius: 8px; padding: 12px; cursor: pointer; }
+.address-results button:hover,.address-results button:focus-visible { border-color: #c3ff00; outline: none; }
 .setup { border-top: 1px solid #2e3440; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start; }
 .setup>div>p:last-child { margin-top: 16px; }
 summary { cursor: pointer; color: #f4f4f5; font-weight: 600; }

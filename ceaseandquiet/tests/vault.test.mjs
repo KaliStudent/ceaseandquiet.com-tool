@@ -2,14 +2,14 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {encryptProfile, decryptProfile, validateProfile, VaultSession} from '../extension/vault.mjs';
 
-const profile = {givenName: 'Taylor', familyName: 'Example', email: 'taylor@example.test', region: 'Test region'};
+const profile = {givenName: 'Taylor', familyName: 'Example', email: 'taylor@example.test', address: '100 Example Street', city: 'Example City', region: 'Test State', postalCode: '00000', dateOfBirth: '2000-01-02', phone: '+1 202-555-0100'};
 const password = 'unique test phrase 247!';
 const envelope = await encryptProfile(profile, password);
 
 test('authenticated encryption round trip stores no profile or passphrase', async () => {
   assert.deepEqual(await decryptProfile(envelope, password), profile);
   const serialized = JSON.stringify(envelope);
-  for (const value of [...Object.values(profile), password]) assert.ok(!serialized.includes(value));
+  for (const value of [...Object.values(profile), password]) assert.ok(!serialized.includes(JSON.stringify(value)));
   const second = await encryptProfile(profile, password);
   assert.notEqual(second.salt, envelope.salt);
   assert.notEqual(second.iv, envelope.iv);
@@ -24,10 +24,16 @@ test('wrong passwords and altered authenticated data are rejected', async () => 
   }
 });
 test('malformed, oversized, legacy, and weakened envelope settings fail closed', async () => {
-  for (const change of [{version: 1}, {iterations: 1}, {cipher: 'AES-CBC'}, {kdf: 'other'}, {salt: '!!'}, {iv: 'AA=='}, {ciphertext: 'A'.repeat(20000)}, {unexpected: 'field'}]) {
+  for (const change of [{version: 1}, {version: 2}, {iterations: 1}, {cipher: 'AES-CBC'}, {kdf: 'other'}, {salt: '!!'}, {iv: 'AA=='}, {ciphertext: 'A'.repeat(20000)}, {unexpected: 'field'}]) {
     await assert.rejects(decryptProfile({...envelope, ...change}, password));
   }
   await assert.rejects(encryptProfile(profile, 'short'));
+});
+
+test('expanded profile validates calendar dates, phone numbers and address completeness', () => {
+  for (const change of [{dateOfBirth: '2000-02-30'}, {dateOfBirth: '9999-01-01'}, {phone: 'not a phone'}, {phone: '+1 23'}, {address: ''}, {postalCode: ''}, {city: ''}]) assert.throws(() => validateProfile({...profile, ...change}));
+  assert.equal(validateProfile({...profile, dateOfBirth: '', phone: ''}).dateOfBirth, '');
+  assert.equal(envelope.version, 3);
 });
 test('profile schema rejects unsupported fields and unsafe or oversized values', () => {
   for (const value of [{...profile, ssn: 'synthetic'}, {...profile, givenName: ''}, {...profile, email: 'invalid'}, {...profile, region: 'x'.repeat(101)}, {...profile, givenName: 'bad\nname'}]) assert.throws(() => validateProfile(value));

@@ -18,6 +18,8 @@ func TestPreviewBoundaries(t *testing.T) {
 		{"GET", "/", "127.0.0.1:8787", 200},
 		{"HEAD", "/styles.css", "127.0.0.1:8787", 200},
 		{"GET", "/site.js", "127.0.0.1:8787", 200},
+		{"GET", "/address.mjs", "127.0.0.1:8787", 200},
+		{"POST", "/api/v1/address-suggestions", "127.0.0.1:8787", 403},
 		{"GET", "/", "attacker.example:8787", 421},
 		{"POST", "/", "127.0.0.1:8787", 405},
 		{"POST", "/api/v1/brokers", "127.0.0.1:8787", 405},

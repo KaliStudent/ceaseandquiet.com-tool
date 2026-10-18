@@ -4,9 +4,10 @@ export function previewForm(profile) {
   const forms = document.querySelectorAll('form#cq-demo-form[data-cq-preview="v1"]');
   if (forms.length !== 1) return {ok: false, reason: 'form'};
   const form = forms[0];
-  const names = ['givenName', 'familyName', 'email', 'region'];
+  const names = ['givenName', 'familyName', 'email', 'address', 'city', 'region', 'postalCode', 'dateOfBirth', 'phone'];
+  const type = name => ({email: 'email', dateOfBirth: 'date', phone: 'tel'}[name] || 'text');
   const inputs = names.map(name => form.elements.namedItem(name));
-  if (inputs.some((input, i) => !(input instanceof HTMLInputElement) || input.type !== (names[i] === 'email' ? 'email' : 'text') || input.disabled || input.readOnly || input.getClientRects().length === 0 || input.value !== '')) return {ok: false, reason: 'fields'};
+  if (inputs.some((input, i) => !(input instanceof HTMLInputElement) || input.type !== type(names[i]) || input.disabled || input.readOnly || input.getClientRects().length === 0 || input.value !== '')) return {ok: false, reason: 'fields'};
   if (profile === undefined) return {ok: true};
   if (!profile || Object.keys(profile).length !== names.length || names.some(name => typeof profile[name] !== 'string')) return {ok: false, reason: 'profile'};
   // Check every target before writing anything. Never submit or requestSubmit.
