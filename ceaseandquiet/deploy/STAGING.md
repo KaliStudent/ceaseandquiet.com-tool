@@ -30,7 +30,7 @@ Local Go tests use a real ephemeral TLS server to verify unauthorized denial on 
 
 After deployment, verify trusted TLS without disabling certificate checks; 401 responses without credentials; page/assets/API with credentials; rejected POST/private-file paths; service identity and limits; and existing website availability. Do not capture credentials or private data in evidence. The service has no access log and no sender dependency.
 
-The existing extension still accepts localhost only. A separate staging build must authorize the exact HTTPS origin and pass its tests before claiming the remote vault flow works. Remaining frontend/backend development proceeds using synthetic data with real broker delivery disabled.
+Extension version 0.3.0 authorizes the exact HTTPS staging origin alongside localhost, with no permanent host permission. Automated destination checks cover both origins and common lookalikes. Native Chrome verification against the password-protected staging page is still required before claiming the remote vault flow works. Remaining frontend/backend development proceeds using synthetic data with real broker delivery disabled.
 
 Certificate renewal requires restarting only the staging service to refresh its systemd credential copy. Establish that renewal action before leaving staging running long term.
 

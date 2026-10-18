@@ -1,6 +1,6 @@
 // Chrome serializes this function. Keep every target check inside it.
 export function previewForm(profile) {
-  if (window.top !== window || location.origin !== 'http://127.0.0.1:8787' || location.pathname !== '/' || location.search) return {ok: false, reason: 'destination'};
+  if (window.top !== window || !['http://127.0.0.1:8787', 'https://abcw.xyz:8443'].includes(location.origin) || location.pathname !== '/' || location.search) return {ok: false, reason: 'destination'};
   const forms = document.querySelectorAll('form#cq-demo-form[data-cq-preview="v1"]');
   if (forms.length !== 1) return {ok: false, reason: 'form'};
   const form = forms[0];
@@ -18,10 +18,10 @@ export function previewForm(profile) {
 export async function fillPreview(chromeAPI, getProfile) {
   const [tab] = await chromeAPI.tabs.query({active: true, currentWindow: true});
   let url;
-  try { url = new URL(tab?.url); } catch { throw new Error('Open the local preview form first.'); }
-  if (!tab?.id || url.origin !== 'http://127.0.0.1:8787' || url.pathname !== '/' || url.search || url.username || url.password) throw new Error('Open the local preview form first.');
+  try { url = new URL(tab?.url); } catch { throw new Error('Open the approved preview form first.'); }
+  if (!tab?.id || !['http://127.0.0.1:8787', 'https://abcw.xyz:8443'].includes(url.origin) || url.pathname !== '/' || url.search || url.username || url.password) throw new Error('Open the approved preview form first.');
   const [probe] = await chromeAPI.scripting.executeScript({target: {tabId: tab.id, frameIds: [0]}, func: previewForm});
-  if (!probe?.result?.ok || !probe.documentId) throw new Error('Use the empty local preview form. Clear any existing fields first.');
+  if (!probe?.result?.ok || !probe.documentId) throw new Error('Use the empty preview form. Clear any existing fields first.');
   const profile = getProfile();
   if (!profile) throw new Error('The vault has locked. Unlock it again.');
   // Pin the write to the document that passed preflight, avoiding navigation races.

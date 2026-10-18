@@ -10,9 +10,9 @@ GET /api/v1/brokers supports q, region (us/eu/global), limit (1–100), and offs
 
 ## Load the extension
 
-Use a clean development Chrome profile. Load ceaseandquiet/extension as an unpacked MV3 extension. Use sample details and a unique test passphrase. The candidate fills only the empty marked form at http://127.0.0.1:8787/. It has no production origin access and never submits the form.
+Use a clean development Chrome profile. Load ceaseandquiet/extension as an unpacked MV3 extension. Use sample details and a unique test passphrase. The candidate fills only the empty marked form at http://127.0.0.1:8787/ or the password-protected staging origin https://abcw.xyz:8443/. It has no production origin access and never submits the form. The staging fill path still needs native Chrome verification.
 
-Version 0.2.0 uses a new authenticated envelope format. Older prototype vaults must be erased and recreated. The vault locks after save, after successful fill, on close/hide, after a failed unlock, or after two minutes. Erase saved vault after successful fill is selected by default. Clearing the popup or deleting saved ciphertext cannot recall values already transferred into a page.
+Version 0.3.0 uses the authenticated envelope format introduced in 0.2.0. Older prototype vaults must be erased and recreated. The vault locks after save, after successful fill, on close/hide, after a failed unlock, or after two minutes. Erase saved vault after successful fill is selected by default. Clearing the popup or deleting saved ciphertext cannot recall values already transferred into a page.
 
 ## Review and rollout
 
