@@ -43,8 +43,8 @@
       </section>
     </section>
     <section id="vault" class="shell section">
-      <div class="section-heading"><div><p class="eyebrow">02 / PREPARE</p><h2>Private by choice.</h2></div><p>Your Chrome vault stores an encrypted profile locally. Unlock it only when you are ready to fill the preview.</p></div>
-      <div class="steps"><article><span>01</span><h3>Save on your device</h3><p>Choose a unique passphrase. The vault saves an encrypted copy of your sample profile.</p></article><article><span>02</span><h3>Unlock when ready</h3><p>Open the extension on this page and unlock. It locks again when closed or after two minutes.</p></article><article><span>03</span><h3>Fill, then clear</h3><p>Click Fill preview form. The popup locks, and you can erase the saved vault with the same action.</p></article></div>
+      <div class="section-heading"><div><p class="eyebrow">02 / PREPARE</p><h2>Your profile. Your control.</h2></div><p>Enter and manage your profile here on the website. Your saved profile is encrypted in this browser. No extension is required.</p></div>
+      <div class="steps"><article><span>01</span><h3>Enter your details</h3><p>Choose a suggested address, then check the street, city, state, and ZIP code.</p></article><article><span>02</span><h3>Save with a passphrase</h3><p>The website encrypts your profile before saving it on this device. Your passphrase is never saved.</p></article><article><span>03</span><h3>Unlock and manage</h3><p>Reveal or edit your details here. Lock them when finished, or erase your saved profile.</p></article></div>
       <div class="panel preview-panel">
         <div class="notice"><strong>Practice with sample details.</strong> This local form never submits. Values clear when you leave the page or after two minutes.</div>
         <form id="cq-demo-form" data-cq-preview="v1" autocomplete="off">
@@ -64,13 +64,26 @@
             <label>Date of birth<input name="dateOfBirth" type="date" autocomplete="off"></label>
             <label>Phone number<input name="phone" type="tel" maxlength="32" autocomplete="off" spellcheck="false"></label>
           </div>
-          <div class="form-footer"><button class="glow-button secondary" type="reset">Clear form</button><p id="form-status" class="subtle" role="status">Ready for a local fill. Nothing will be submitted.</p></div>
+          <section class="website-vault" aria-label="Encrypted website profile">
+            <p id="website-vault-mode" class="eyebrow">WEBSITE PROFILE</p>
+            <label for="website-passphrase">Profile passphrase</label>
+            <input id="website-passphrase" type="password" autocomplete="off" minlength="12" maxlength="1024" aria-describedby="passphrase-help">
+            <p id="passphrase-help" class="subtle">Use at least 12 characters. There is no passphrase recovery. Saved profiles belong to this browser and website address; clearing site data erases them. Date of birth and phone are optional during testing.</p>
+            <div class="actions profile-actions">
+              <button id="website-save" class="glow-button" type="button" disabled>Encrypt and save profile</button>
+              <button id="website-unlock" class="glow-button" type="button" hidden disabled>Unlock profile</button>
+              <button id="website-lock" class="glow-button secondary" type="button">Lock and clear</button>
+              <button id="website-erase" class="glow-button secondary" type="button" hidden disabled>Erase saved profile</button>
+            </div>
+            <p id="website-vault-status" class="subtle" role="status" aria-live="polite">Opening website storage…</p>
+          </section>
+          <div class="form-footer"><button class="glow-button secondary" type="reset">Clear form</button><p id="form-status" class="subtle" role="status">Enter details directly here. Nothing will be submitted.</p></div>
         </form>
       </div>
     </section>
     <section id="setup" class="shell section setup">
-      <div><p class="eyebrow">03 / GET STARTED</p><h2>A small, private beta.</h2><p>The beta package includes the local preview and unpacked Chrome extension. Use synthetic details while the final review is pending.</p></div>
-      <details class="panel"><summary>Set up the local beta</summary><ol><li>Extract the beta package and start <strong>cq-preview.exe</strong> from its preview folder.</li><li>Open <strong>http://127.0.0.1:8787</strong> in Chrome.</li><li>Open <strong>chrome://extensions</strong>, enable Developer mode, choose Load unpacked, and select the package's extension folder.</li><li>Open the extension. Try a sample profile such as Taylor Example and taylor@example.test, with a unique test passphrase.</li><li>Encrypt and save, unlock, then fill the empty preview form. Clear the form when finished.</li></ol><p class="subtle">There is no passphrase recovery. Older prototype vaults must be erased and recreated. The extension fills only this local beta page.</p></details>
+      <div><p class="eyebrow">03 / GET STARTED</p><h2>Start on the website.</h2><p>Use the profile form above to prepare and securely save sample details. The broker directory and address suggestions work here without installing anything.</p></div>
+      <details class="panel"><summary>Using your website profile</summary><ol><li>Enter sample details and select an address suggestion, or enter the address manually.</li><li>Choose a unique test passphrase, then select <strong>Encrypt and save profile</strong>.</li><li>Enter your passphrase and select <strong>Unlock profile</strong> to reveal and edit your saved details.</li><li>Enter your passphrase again to save changes. Select <strong>Lock and clear</strong> when finished.</li><li>Select <strong>Erase saved profile</strong> to remove the encrypted copy from this website's browser storage.</li></ol><p class="subtle">The profile locks when you leave or hide the page and after two minutes unlocked. Requests and broker email delivery are still being developed; this form does not send them.</p></details>
     </section>
   </main>
   <footer class="shell footer"><span>Cease &amp; Quiet · local beta candidate</span><span>Final security review pending</span></footer>

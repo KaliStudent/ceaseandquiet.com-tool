@@ -90,3 +90,7 @@ details li { margin: 14px 0; }
 .address-field { grid-column: 1 / -1; min-width: 0; }
 .address-field .address-opt-in { margin-top: 12px; }
 .address-field .address-results { margin-bottom: 8px; }
+
+.website-vault { border-top: 1px solid #2e3440; margin: 24px 0; padding-top: 20px; }
+.website-vault input { max-width: 560px; }
+.profile-actions { justify-content: flex-start; margin: 20px 0 12px; }

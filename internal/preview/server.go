@@ -27,11 +27,11 @@ func New(addr string) (http.Handler, error) {
 	mux := http.NewServeMux()
 	mux.Handle("/api/", api.Handler())
 	mux.Handle("/api/v1/address-suggestions", addressapi.New(os.Getenv("CQ_GEOAPIFY_API_KEY")))
-	for _, name := range []string{"index.html", "styles.css", "site.js", "address.mjs", "form-tools.mjs"} {
+	for _, name := range []string{"index.html", "styles.css", "site.js", "address.mjs", "form-tools.mjs", "vault.mjs", "profile-vault.mjs"} {
 		var content []byte
 		var err error
-		if name == "address.mjs" {
-			content, err = cqassets.Files.ReadFile("extension/address.mjs")
+		if name == "address.mjs" || name == "vault.mjs" {
+			content, err = cqassets.Files.ReadFile("extension/" + name)
 		} else {
 			content, err = previewsite.Files.ReadFile(name)
 		}

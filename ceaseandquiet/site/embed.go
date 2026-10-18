@@ -3,5 +3,5 @@ package previewsite
 
 import "embed"
 
-//go:embed index.html styles.css site.js form-tools.mjs
+//go:embed index.html styles.css site.js form-tools.mjs profile-vault.mjs
 var Files embed.FS

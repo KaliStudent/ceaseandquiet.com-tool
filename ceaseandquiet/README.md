@@ -1,10 +1,10 @@
 # Cease & Quiet local beta candidate
 
-This candidate provides a local broker directory and an encrypted Chrome vault for a sample form. It is staged for the owner's final review.
+This candidate provides a website broker directory, address suggestions, and encrypted website profile storage. An optional Chrome vault remains available. It is staged for the owner's final review.
 
 ## Run from source
 
-From the repository root, run go run ./cmd/cq-preview and open http://127.0.0.1:8787/. The Go process binds only to loopback, serves embedded allowlisted assets, rejects unexpected Host headers, and prevents form submission through browser CSP. No full profile is accepted. Optional address suggestions accept only a partial address after opt-in.
+From the repository root, run go run ./cmd/cq-preview and open http://127.0.0.1:8787/. The Go process binds only to loopback, serves embedded allowlisted assets, rejects unexpected Host headers, and prevents form submission through browser CSP. No full profile is accepted. Address suggestions are enabled by default and accept only address text. They can be switched off.
 
 GET /api/v1/brokers supports q, region (us/eu/global), limit (1–100), and offset. Responses provide public metadata, total count, and paging state. GET /api/v1/brokers/{id} returns one record. Contact channels remain unreviewed and are omitted.
 
@@ -27,3 +27,9 @@ Run ceaseandquiet/scripts/package-beta.ps1 -OutputDirectory <absolute output dir
 ## Expanded profile and address suggestions
 
 The forms now include name, email, street address, city, state, ZIP code, birth date, and phone. See ADDRESS-AUTOCOMPLETE.md for optional Geoapify lookup, server-side key configuration, privacy boundaries, compatibility, and pending native verification of version 0.4.0.
+
+## Website profile workflow
+
+Enter, encrypt, save, unlock, edit, lock, and erase your profile directly on the website. No extension is needed. Only an authenticated AES-GCM envelope is persisted in this origin's localStorage; passphrases are not stored. Profiles lock on hide/navigation, explicit lock/reset, failed unlock, and after two minutes unlocked. Browser storage and write failures are reported without claiming success. Storage is separate from the extension and from other origins. This is staged functionality awaiting visual checks and the owner's final security review.
+
+Staging applies 180 requests per minute per TCP peer, a 600-request global minute budget, 32 concurrent handlers, and a 16 KiB request-body cap before authentication/application work. Address lookup retains its stricter 1024-byte body and 60-provider-lookups/minute cap. IP buckets use process-salted hashes retained only in the current minute. Forwarded headers cannot bypass the peer limit. These are application limits; CAPTCHA, email verification, and network-level DDoS protection are separate pending work.

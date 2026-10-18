@@ -1,5 +1,8 @@
 import {attachAddressSuggestions} from './address.mjs';
 import {lookupWebsiteAddress, attachBirthDatePicker} from './form-tools.mjs';
+import {FIELDS, encryptProfile, decryptProfile} from './vault.mjs';
+import {attachWebsiteVault} from './profile-vault.mjs';
+
 const search = document.querySelector('#broker-search');
 const region = document.querySelector('#region-filter');
 const results = document.querySelector('#broker-results');
@@ -60,6 +63,13 @@ const form = document.querySelector('#cq-demo-form');
 const formStatus = document.querySelector('#form-status');
 const suggestions = attachAddressSuggestions({address: form.elements.namedItem('address'), city: form.elements.namedItem('city'), region: form.elements.namedItem('region'), postalCode: form.elements.namedItem('postalCode'), enabled: document.querySelector('#address-enabled'), results: document.querySelector('#address-results'), status: document.querySelector('#address-status'), lookup: lookupWebsiteAddress});
 attachBirthDatePicker(form.elements.namedItem('dateOfBirth'));
+let browserStorage;
+try { browserStorage = window.localStorage; } catch { /* The vault reports unavailable storage below. */ }
+const websiteVault = attachWebsiteVault({form, fields: FIELDS, encrypt: encryptProfile, decrypt: decryptProfile, storage: browserStorage, clearSuggestions: suggestions.clear, controls: {
+  passphrase: document.querySelector('#website-passphrase'), mode: document.querySelector('#website-vault-mode'), status: document.querySelector('#website-vault-status'),
+  save: document.querySelector('#website-save'), unlock: document.querySelector('#website-unlock'), lock: document.querySelector('#website-lock'), erase: document.querySelector('#website-erase')
+}});
+
 let clearTimer;
 function clearForm() { form.reset(); }
 form.addEventListener('submit', event => { event.preventDefault(); formStatus.textContent = 'This preview never submits. Use Clear form when finished.'; });
@@ -72,6 +82,6 @@ form.addEventListener('reset', () => {
   clearTimeout(clearTimer); suggestions.clear(); document.querySelector('#address-status').textContent = 'Suggestions are enabled. Geoapify receives the partial address you type. Manual entry always works.'; formStatus.textContent = 'Form cleared. Nothing was submitted.';
 });
 window.addEventListener('pagehide', clearForm);
-window.addEventListener('pageshow', event => { if (event.persisted) clearForm(); });
+window.addEventListener('pageshow', event => { if (event.persisted) { clearForm(); websiteVault.lock(); } });
 document.addEventListener('visibilitychange', () => { if (document.hidden) clearForm(); });
 loadBrokers();
