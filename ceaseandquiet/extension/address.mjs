@@ -31,7 +31,15 @@ export function attachAddressSuggestions({address, city, region, postalCode, ena
         status.textContent = items.length ? 'Choose an address, then check the filled fields.' : 'No matches. Continue entering the address manually.';
       } catch (error) {
         if (current !== generation || error.name === 'AbortError') return;
-        status.textContent = 'Suggestions unavailable. Continue entering the address manually.';
+        const messages = {
+          401: 'Sign in to staging again, then retry the address.',
+          403: 'The address request was blocked. Refresh this page and retry.',
+          429: 'Too many address searches. Wait one minute and try again.',
+          502: 'The address provider did not respond. Try again shortly.',
+          503: 'The address service is not configured.',
+          connection: 'Could not connect to address suggestions. Check your connection and retry.'
+        };
+        status.textContent = (messages[error.code] || 'Suggestions unavailable.') + ' You can enter the address manually.';
       }
     }, 400);
   });

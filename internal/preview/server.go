@@ -27,7 +27,7 @@ func New(addr string) (http.Handler, error) {
 	mux := http.NewServeMux()
 	mux.Handle("/api/", api.Handler())
 	mux.Handle("/api/v1/address-suggestions", addressapi.New(os.Getenv("CQ_GEOAPIFY_API_KEY")))
-	for _, name := range []string{"index.html", "styles.css", "site.js", "address.mjs"} {
+	for _, name := range []string{"index.html", "styles.css", "site.js", "address.mjs", "form-tools.mjs"} {
 		var content []byte
 		var err error
 		if name == "address.mjs" {
