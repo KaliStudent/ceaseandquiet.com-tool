@@ -14,7 +14,7 @@ import (
 )
 
 // New requires one explicit public hostname and port. It exposes no sender or
-// personal-data endpoints; credentials are checked before serving any asset/API.
+// full-profile submission; credentials are checked before serving any asset/API.
 func New(host, username string, passwordHash [sha256.Size]byte) (http.Handler, error) {
 	name, port, err := net.SplitHostPort(host)
 	n, portErr := strconv.Atoi(port)

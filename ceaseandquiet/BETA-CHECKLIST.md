@@ -13,7 +13,7 @@ This is a reusable acceptance checklist. Partial execution in an existing profil
 
 ## Vault lifecycle
 
-- [ ] Enter Taylor Example, taylor@example.test, and a sample region. Set a unique passphrase with at least 12 characters.
+- [ ] Enter Taylor Example, taylor@example.test, street address 100 Example Street, city Example City, state Test State, ZIP 00000, birth date 2000-01-02, and phone +1 202-555-0100. Set a unique passphrase with at least 12 characters.
 - [ ] Encrypt and save. The revealed fields clear and the popup locks.
 - [ ] Close and reopen the popup. The vault remains locked and no profile values are visible.
 - [ ] Try a wrong passphrase. The popup remains locked and clears the passphrase.
@@ -24,7 +24,7 @@ This is a reusable acceptance checklist. Partial execution in an existing profil
 ## Form fill and deletion
 
 - [ ] Start with the empty local preview form. Unlock, leave Erase saved vault selected, and click Fill preview form.
-- [ ] Confirm all four fields fill correctly, the popup locks, the saved vault is erased, and no form is submitted.
+- [ ] Confirm all nine fields fill correctly, the popup locks, the saved vault is erased, and no form is submitted.
 - [ ] Reopen the extension and confirm there is no saved vault.
 - [ ] Clear the page form and confirm all fields are blank.
 - [ ] Repeat with Erase saved vault unselected. After fill, the popup locks and the encrypted vault can still be unlocked.

@@ -8,6 +8,7 @@ DynamicUser=true
 ExecStart=/opt/ceaseandquiet-staging/cq-staging
 Environment=CQ_STAGING_HOST=abcw.xyz:8443
 Environment=CQ_STAGING_USER=reviewer
+EnvironmentFile=-/etc/ceaseandquiet-staging/address.env
 Environment=CQ_STAGING_PASSWORD_SHA256_FILE=%d/auth.sha256
 Environment=CQ_STAGING_TLS_CERT_FILE=%d/tls.pem
 Environment=CQ_STAGING_TLS_KEY_FILE=%d/tls.pem

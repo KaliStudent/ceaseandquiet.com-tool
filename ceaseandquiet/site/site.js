@@ -1,3 +1,4 @@
+import {attachAddressSuggestions} from './address.mjs';
 const search = document.querySelector('#broker-search');
 const region = document.querySelector('#region-filter');
 const results = document.querySelector('#broker-results');
@@ -56,6 +57,11 @@ document.querySelector('#close-detail').addEventListener('click', () => { detail
 
 const form = document.querySelector('#cq-demo-form');
 const formStatus = document.querySelector('#form-status');
+const suggestions = attachAddressSuggestions({address: form.elements.namedItem('address'), city: form.elements.namedItem('city'), region: form.elements.namedItem('region'), postalCode: form.elements.namedItem('postalCode'), enabled: document.querySelector('#address-enabled'), results: document.querySelector('#address-results'), status: document.querySelector('#address-status'), lookup: async (text, signal) => {
+  const response = await fetch('/api/v1/address-suggestions', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({text}), cache: 'no-store', signal});
+  if (!response.ok) throw new Error('Suggestions unavailable');
+  return (await response.json()).items;
+}});
 let clearTimer;
 function clearForm() { form.reset(); }
 form.addEventListener('submit', event => { event.preventDefault(); formStatus.textContent = 'This preview never submits. Use Clear form when finished.'; });
@@ -65,7 +71,7 @@ form.addEventListener('input', () => {
   formStatus.textContent = 'Details are only in this page. They clear after two minutes.';
 });
 form.addEventListener('reset', () => {
-  clearTimeout(clearTimer); formStatus.textContent = 'Form cleared. Nothing was submitted.';
+  clearTimeout(clearTimer); suggestions.clear(); document.querySelector('#address-status').textContent = 'Suggestions are enabled. Geoapify receives the partial address you type. Manual entry always works.'; formStatus.textContent = 'Form cleared. Nothing was submitted.';
 });
 window.addEventListener('pagehide', clearForm);
 window.addEventListener('pageshow', event => { if (event.persisted) clearForm(); });

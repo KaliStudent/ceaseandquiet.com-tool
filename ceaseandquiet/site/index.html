@@ -6,7 +6,7 @@
   <meta name="referrer" content="no-referrer">
   <title>Cease &amp; Quiet — your local privacy toolkit</title>
   <link rel="stylesheet" href="styles.css">
-  <script src="site.js" defer></script>
+  <script type="module" src="site.js"></script>
 </head>
 <body>
   <a class="skip" href="#directory">Skip to broker directory</a>
@@ -48,7 +48,21 @@
       <div class="panel preview-panel">
         <div class="notice"><strong>Practice with sample details.</strong> This local form never submits. Values clear when you leave the page or after two minutes.</div>
         <form id="cq-demo-form" data-cq-preview="v1" autocomplete="off">
-          <div class="form-grid"><label>First name<input name="givenName" maxlength="100" autocomplete="off" spellcheck="false"></label><label>Last name<input name="familyName" maxlength="100" autocomplete="off" spellcheck="false"></label><label>Email<input name="email" type="email" maxlength="254" autocomplete="off" spellcheck="false"></label><label>State or region<input name="region" maxlength="100" autocomplete="off" spellcheck="false"></label></div>
+          <div class="form-grid">
+            <label>First name<input name="givenName" maxlength="100" autocomplete="off" spellcheck="false"></label>
+            <label>Last name<input name="familyName" maxlength="100" autocomplete="off" spellcheck="false"></label>
+            <label>Email<input name="email" type="email" maxlength="254" autocomplete="off" spellcheck="false"></label>
+            <label>Street address<input name="address" maxlength="200" autocomplete="off" spellcheck="false"></label>
+            <label>City<input name="city" maxlength="100" autocomplete="off" spellcheck="false"></label>
+            <label>State<input name="region" maxlength="100" autocomplete="off" spellcheck="false"></label>
+            <label>ZIP code<input name="postalCode" maxlength="20" autocomplete="off" spellcheck="false"></label>
+            <label>Date of birth<input name="dateOfBirth" type="date" autocomplete="off"></label>
+            <label>Phone number<input name="phone" type="tel" maxlength="32" autocomplete="off" spellcheck="false"></label>
+          </div>
+          <label class="address-opt-in"><input id="address-enabled" type="checkbox" checked> Enable address suggestions</label>
+          <p id="address-status" class="subtle" role="status">Geoapify receives only the partial address you search for. Manual entry always works. Date of birth and phone are optional in this preview.</p>
+          <ul id="address-results" class="address-results" aria-label="Address suggestions" hidden></ul>
+          <p class="subtle">Address data: <a href="https://www.geoapify.com/" target="_blank" rel="noreferrer">Geoapify</a> · <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap contributors</a></p>
           <div class="form-footer"><button class="glow-button secondary" type="reset">Clear form</button><p id="form-status" class="subtle" role="status">Ready for a local fill. Nothing will be submitted.</p></div>
         </form>
       </div>

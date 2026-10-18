@@ -1,13 +1,14 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-const profile = {givenName: 'Taylor', familyName: 'Example', email: 'taylor@example.test', region: 'Test region'};
+const profile = {givenName: 'Taylor', familyName: 'Example', email: 'taylor@example.test', address: '100 Example Street', city: 'Example City', region: 'Test State', postalCode: '00000', dateOfBirth: '2000-01-02', phone: '+1 202-555-0100'};
 const password = 'unique test phrase 247!';
 let counter = 0;
 
 async function popup({stored, failDelete = false, failStorage = false, url = 'http://127.0.0.1:8787/'} = {}) {
-  const ids = ['givenName','familyName','email','region','passphrase','profile-panel','unlock-panel','mode','save','unlock','fill','lock','erase','erase-after','state'];
-  const elements = Object.fromEntries(ids.map(id => [id, {value: '', hidden: false, disabled: false, checked: true, listeners: {}, addEventListener(name, callback) { this.listeners[name] = callback; }}]));
+  const ids = [...Object.keys(profile),'passphrase','profile-panel','unlock-panel','mode','save','unlock','fill','lock','erase','erase-after','state','address-enabled','address-results','address-status'];
+  const elements = Object.fromEntries(ids.map(id => [id, {value: '', hidden: false, disabled: false, checked: true, listeners: {}, replaceChildren() {}, addEventListener(name, callback) { this.listeners[name] = callback; }}]));
+  elements['address-enabled'].checked = false;
   const events = {}, docEvents = {};
   let storage = stored;
   globalThis.document = {hidden: false, getElementById: id => elements[id], addEventListener: (name, callback) => { docEvents[name] = callback; }};

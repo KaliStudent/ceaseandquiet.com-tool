@@ -23,7 +23,15 @@
       <label>Last name<input id="familyName" autocomplete="off" maxlength="100" spellcheck="false"></label>
     </div>
     <label>Email<input id="email" type="email" autocomplete="off" maxlength="254" spellcheck="false"></label>
-    <label>State or region <span class="hint">(optional)</span><input id="region" autocomplete="off" maxlength="100" spellcheck="false"></label>
+    <label>Street address<input id="address" autocomplete="off" maxlength="200" spellcheck="false"></label>
+    <label class="check"><input id="address-enabled" type="checkbox" checked> Enable address suggestions</label>
+    <p id="address-status" class="hint" role="status">Suggestions share only your partial address through the approved preview page with Geoapify. Manual entry always works.</p>
+    <ul id="address-results" class="address-results" aria-label="Address suggestions" hidden></ul>
+    <p class="hint">Address data: <a href="https://www.geoapify.com/" target="_blank" rel="noreferrer">Geoapify</a> · <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap contributors</a></p>
+    <div class="grid"><label>City<input id="city" autocomplete="off" maxlength="100" spellcheck="false"></label><label>State<input id="region" autocomplete="off" maxlength="100" spellcheck="false"></label></div>
+    <label>ZIP code<input id="postalCode" autocomplete="off" maxlength="20" spellcheck="false"></label>
+    <div class="grid"><label>Date of birth<input id="dateOfBirth" type="date" autocomplete="off"></label><label>Phone number<input id="phone" type="tel" autocomplete="off" maxlength="32"></label></div>
+    <p class="hint">Date of birth and phone are optional here. A broker’s verified procedure determines which details a request needs.</p>
   </section>
   <label class="check"><input id="erase-after" type="checkbox" checked> Erase saved vault after a successful fill</label>
   <div class="buttons">

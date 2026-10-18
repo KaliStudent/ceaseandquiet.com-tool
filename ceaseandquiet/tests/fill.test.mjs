@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {runInNewContext} from 'node:vm';
 import {fillPreview, previewForm} from '../extension/fill.mjs';
 
-const profile = {givenName: 'Taylor', familyName: 'Example', email: 'taylor@example.test', region: 'Test region'};
+const profile = {givenName: 'Taylor', familyName: 'Example', email: 'taylor@example.test', address: '100 Example Street', city: 'Example City', region: 'Test State', postalCode: '00000', dateOfBirth: '2000-01-02', phone: '+1 202-555-0100'};
 function mockChrome(url = 'http://127.0.0.1:8787/#vault') {
   const calls = [];
   return {calls, tabs: {query: async () => [{id: 7, url}]}, scripting: {executeScript: async input => {
@@ -27,7 +27,7 @@ test('serialized preflight rejects insecure, lookalike, wrong-port and framed st
     constructor(type) { this.type = type; }
     getClientRects() { return [{}]; }
   }
-  const inputs = Object.fromEntries(Object.keys(profile).map(name => [name, new Input(name === 'email' ? 'email' : 'text')]));
+  const inputs = Object.fromEntries(Object.keys(profile).map(name => [name, new Input(({email: 'email', dateOfBirth: 'date', phone: 'tel'}[name] || 'text'))]));
   const sandbox = {
     window: {}, location: {origin: 'https://abcw.xyz:8443', pathname: '/', search: ''},
     HTMLInputElement: Input,
@@ -64,7 +64,7 @@ test('injected function rechecks origin and validates all fields before writing'
     dispatchEvent() {}
   }
   const names = Object.keys(profile);
-  const inputs = names.map(name => new Input(name === 'email' ? 'email' : 'text'));
+  const inputs = names.map(name => new Input(({email: 'email', dateOfBirth: 'date', phone: 'tel'}[name] || 'text')));
   globalThis.HTMLInputElement = Input;
   globalThis.window = {}; window.top = window;
   globalThis.location = {origin: 'http://127.0.0.1:8787', pathname: '/'};

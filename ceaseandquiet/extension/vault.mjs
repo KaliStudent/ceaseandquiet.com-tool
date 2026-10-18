@@ -1,6 +1,6 @@
-export const FIELDS = Object.freeze(['givenName', 'familyName', 'email', 'region']);
+export const FIELDS = Object.freeze(['givenName', 'familyName', 'email', 'address', 'city', 'region', 'postalCode', 'dateOfBirth', 'phone']);
 export const ITERATIONS = 600000;
-const CONTEXT = new TextEncoder().encode('CeaseAndQuiet:local-vault:v1');
+const CONTEXT = new TextEncoder().encode('CeaseAndQuiet:local-vault:v3');
 const bytes = value => new TextEncoder().encode(value);
 const base64 = value => btoa(String.fromCharCode(...new Uint8Array(value)));
 
@@ -15,10 +15,17 @@ export function validateProfile(input) {
   if (!input || typeof input !== 'object' || Array.isArray(input) || Object.keys(input).length !== FIELDS.length) throw new Error('Invalid profile');
   const profile = {};
   for (const name of FIELDS) {
-    if (!Object.hasOwn(input, name) || typeof input[name] !== 'string' || input[name].length > (name === 'email' ? 254 : 100) || /[\u0000-\u001f\u007f]/.test(input[name])) throw new Error('Invalid profile');
+    const limit = {email: 254, address: 200, postalCode: 20, dateOfBirth: 10, phone: 32}[name] || 100;
+    if (!Object.hasOwn(input, name) || typeof input[name] !== 'string' || input[name].length > limit || /[\u0000-\u001f\u007f]/.test(input[name])) throw new Error('Invalid profile');
     profile[name] = input[name].trim();
   }
   if (!profile.givenName || !profile.familyName || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(profile.email)) throw new Error('Enter a first name, last name, and valid email.');
+  if (['address', 'city', 'region', 'postalCode'].some(name => !profile[name])) throw new Error('Enter your address, city, state, and ZIP code.');
+  if (profile.dateOfBirth) {
+    const date = new Date(profile.dateOfBirth + 'T00:00:00Z');
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(profile.dateOfBirth) || Number.isNaN(date.valueOf()) || date.toISOString().slice(0, 10) !== profile.dateOfBirth || profile.dateOfBirth > new Date().toISOString().slice(0, 10)) throw new Error('Enter a valid date of birth that is not in the future.');
+  }
+  if (profile.phone && (!/^\+?[0-9 ().-]+$/.test(profile.phone) || profile.phone.replace(/\D/g, '').length < 7 || profile.phone.replace(/\D/g, '').length > 15)) throw new Error('Enter a valid phone number, including country code when needed.');
   return profile;
 }
 
@@ -36,12 +43,12 @@ export async function encryptProfile(input, passphrase) {
   const plaintext = bytes(JSON.stringify(profile));
   try {
     const ciphertext = await crypto.subtle.encrypt({name: 'AES-GCM', iv, additionalData: CONTEXT}, key, plaintext);
-    return {version: 2, kdf: 'PBKDF2-SHA256', iterations: ITERATIONS, cipher: 'AES-256-GCM', salt: base64(salt), iv: base64(iv), ciphertext: base64(ciphertext)};
+    return {version: 3, kdf: 'PBKDF2-SHA256', iterations: ITERATIONS, cipher: 'AES-256-GCM', salt: base64(salt), iv: base64(iv), ciphertext: base64(ciphertext)};
   } finally { plaintext.fill(0); }
 }
 
 export async function decryptProfile(envelope, passphrase) {
-  if (!envelope || typeof envelope !== 'object' || Object.keys(envelope).length !== 7 || envelope.version !== 2 || envelope.kdf !== 'PBKDF2-SHA256' || envelope.iterations !== ITERATIONS || envelope.cipher !== 'AES-256-GCM') throw new Error('Invalid or older vault. Erase it and create a new one.');
+  if (!envelope || typeof envelope !== 'object' || Object.keys(envelope).length !== 7 || envelope.version !== 3 || envelope.kdf !== 'PBKDF2-SHA256' || envelope.iterations !== ITERATIONS || envelope.cipher !== 'AES-256-GCM') throw new Error('Invalid or older vault. Erase it and create a new one.');
   const salt = fromBase64(envelope.salt, 16, 16);
   const iv = fromBase64(envelope.iv, 12, 12);
   const ciphertext = fromBase64(envelope.ciphertext, 17, 4096);
