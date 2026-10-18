@@ -24,7 +24,7 @@ No JavaScript implementation can promise forensic erasure of immutable strings, 
 - Added submission prevention in the page and a CSP with form-action none, including when JavaScript fails.
 - Cleared stale revealed fields and passphrases on failed unlock or locking.
 - Added an absolute session deadline and cancellation of late unlock results.
-- Removed the unreviewed production fill origin. This candidate accepts only http://127.0.0.1:8787/ (optional anchor).
+- Removed the unreviewed production fill origin. This candidate accepts only http://127.0.0.1:8787/ and https://abcw.xyz:8443/ (optional anchor). The staging origin is password protected and must be verified in native Chrome before beta use.
 - Pinned fill to the document that passed preflight and rechecked the destination within the injected function.
 - Rejected malformed vaults, unsupported metadata, weak/changed KDF settings, oversized values, and unexpected profile fields.
 - Restricted local storage to trusted extension contexts and blocked extension network connections with CSP.

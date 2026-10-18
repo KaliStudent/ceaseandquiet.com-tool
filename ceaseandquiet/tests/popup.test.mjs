@@ -5,7 +5,7 @@ const profile = {givenName: 'Taylor', familyName: 'Example', email: 'taylor@exam
 const password = 'unique test phrase 247!';
 let counter = 0;
 
-async function popup({stored, failDelete = false, failStorage = false} = {}) {
+async function popup({stored, failDelete = false, failStorage = false, url = 'http://127.0.0.1:8787/'} = {}) {
   const ids = ['givenName','familyName','email','region','passphrase','profile-panel','unlock-panel','mode','save','unlock','fill','lock','erase','erase-after','state'];
   const elements = Object.fromEntries(ids.map(id => [id, {value: '', hidden: false, disabled: false, checked: true, listeners: {}, addEventListener(name, callback) { this.listeners[name] = callback; }}]));
   const events = {}, docEvents = {};
@@ -19,7 +19,7 @@ async function popup({stored, failDelete = false, failStorage = false} = {}) {
       set: async input => { storage = structuredClone(input.vault); },
       remove: async () => { if (failDelete) throw new Error('Deletion failed'); storage = undefined; }
     }},
-    tabs: {query: async () => [{id: 7, url: 'http://127.0.0.1:8787/'}]},
+    tabs: {query: async () => [{id: 7, url}]},
     scripting: {executeScript: async () => [{documentId: 'same-document', result: {ok: true}}]}
   };
   await import('../extension/popup.js?test=' + counter++);
@@ -57,6 +57,20 @@ test('fill deletion failure keeps encrypted record and still clears revealed val
     assert.ok(ui.storage()); assert.equal(ui.elements.givenName.value, '');
     assert.match(ui.elements.state.textContent, /deletion failed/);
     assert.equal(ui.elements['profile-panel'].hidden, true);
+  } finally { ui.close(); }
+});
+
+test('staging popup fills the approved HTTPS origin and clears its saved vault', async () => {
+  const ui = await popup({url: 'https://abcw.xyz:8443/#vault'});
+  try {
+    for (const [name,value] of Object.entries(profile)) ui.elements[name].value = value;
+    ui.elements.passphrase.value = password; await ui.click('save');
+    ui.elements.passphrase.value = password; await ui.click('unlock');
+    await ui.click('fill');
+    assert.equal(ui.storage(), undefined);
+    assert.ok(Object.keys(profile).every(name => ui.elements[name].value === ''));
+    assert.equal(ui.elements.fill.hidden, true);
+    assert.match(ui.elements.state.textContent, /Saved vault erased/);
   } finally { ui.close(); }
 });
 test('hiding the popup clears visible fields; unavailable storage disables operations', async () => {
