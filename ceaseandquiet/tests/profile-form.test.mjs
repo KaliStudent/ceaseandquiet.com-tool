@@ -14,7 +14,7 @@ test('both forms expose the exact encrypted profile fields without duplicate IDs
   }
   for (const html of [popup, website]) {
     assert.match(html, /type="date"/); assert.match(html, /type="tel"/);
-    assert.match(html, /id="address-enabled" type="checkbox">/);
-    assert.doesNotMatch(html, /id="address-enabled"[^>]*checked/);
+    assert.match(html, /id="address-enabled" type="checkbox" checked>/);
+    assert.match(html, /id="address-enabled"[^>]*checked/);
   }
 });

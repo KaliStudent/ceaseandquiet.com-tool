@@ -33,7 +33,7 @@ function render() {
 }
 
 function lock(text = 'Vault locked. Revealed fields cleared.') {
-  lifecycle++; clearTimeout(timer); suggestions.clear(); $('address-enabled').checked = false; session.lock(); clearFields(); render(); message(text);
+  lifecycle++; clearTimeout(timer); suggestions.clear(); session.lock(); clearFields(); render(); message(text);
 }
 
 async function save() {

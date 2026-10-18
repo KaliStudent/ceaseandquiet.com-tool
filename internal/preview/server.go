@@ -1,4 +1,4 @@
-// Package preview serves the local beta without file browsing or personal intake.
+// Package preview serves the local beta without file browsing or full-profile intake.
 package preview
 
 import (

@@ -10,7 +10,7 @@ All nine fields participate in encryption, lock/expiry cleanup, and atomic docum
 
 ## Address lookup
 
-Both forms offer an unchecked Enable address suggestions box. After opting in and typing at least four characters, a 400 ms debounce calls the same-origin `/api/v1/address-suggestions` endpoint with a JSON body containing only `text`. Selecting a suggestion fills street address, city, state, and ZIP. Users must check the result and add unit details manually.
+Both forms offer an enabled-by-default address suggestions box. Users can switch it off. After typing at least four characters, a 400 ms debounce calls the same-origin `/api/v1/address-suggestions` endpoint with a JSON body containing only `text`. Selecting a suggestion fills street address, city, state, and ZIP. Users must check the result and add unit details manually.
 
 The extension performs lookup inside the approved page with its temporary activeTab grant. It retains connect-src none, no permanent host permissions, and no direct provider access. Open the approved preview page before using suggestions in the popup; otherwise manual entry remains available.
 
@@ -29,10 +29,10 @@ Without a key, lookup returns 503 and the UI offers manual entry. Errors, origin
 
 The proxy accepts only JSON POST, one text field of 4–200 bytes, a maximum 1024-byte body, and an approved Origin. It has a four-second provider timeout, rejects redirects, caps response reads at 64 KiB, returns at most five normalized suggestions, and permits at most 60 provider requests per minute across this process. Review provider quotas before enabling it for more users.
 
-This is the first intentional server-side address input in the preview. It is limited to opt-in lookup; there is still no full-profile submission, SMTP integration, or broker delivery endpoint. Deployment and external-provider activation remain separate from local implementation.
+This is the first intentional server-side address input in the preview. It is limited to address lookup; there is still no full-profile submission, SMTP integration, or broker delivery endpoint. Deployment and external-provider activation remain separate from local implementation.
 
 ## Verification scope
 
-Automated tests cover encryption/validation of the expanded profile, all-field fill checks, opt-in and selection behavior, stale-result cancellation, provider response normalization, input/origin rejection, disabled-provider fallback, redacted failures, and rate limiting. Browser automation was denied by its URL policy during this change, so visual/native verification of version 0.4.0 remains pending. Earlier native reports cover earlier versions only.
+Automated tests cover encryption/validation of the expanded profile, all-field fill checks, enable/disable and selection behavior, stale-result cancellation, provider response normalization, input/origin rejection, disabled-provider fallback, redacted failures, and rate limiting. Browser automation was denied by its URL policy during this change, so visual/native verification of version 0.4.0 remains pending. Earlier native reports cover earlier versions only.
 
 Provider references: https://apidocs.geoapify.com/docs/geocoding/address-autocomplete/ and https://myprojects.geoapify.com/help/api-keys/ .

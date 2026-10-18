@@ -40,21 +40,21 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Cache-Control", "no-store")
 	w.Header().Set("Content-Type", "application/json")
 	if r.Method != http.MethodPost {
-		http.Error(w, `{"error":"POST required"}`, 405)
+		http.Error(w, `{"error":"POST required"}`, http.StatusMethodNotAllowed)
 		return
 	}
 	if r.URL.RawQuery != "" {
-		http.Error(w, `{"error":"query parameters not accepted"}`, 400)
+		http.Error(w, `{"error":"query parameters not accepted"}`, http.StatusBadRequest)
 		return
 	}
 	origin := r.Header.Get("Origin")
 	if origin != "https://abcw.xyz:8443" && origin != "http://127.0.0.1:8787" {
-		http.Error(w, `{"error":"origin rejected"}`, 403)
+		http.Error(w, `{"error":"origin rejected"}`, http.StatusForbidden)
 		return
 	}
 	mediaType, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
 	if err != nil || mediaType != "application/json" {
-		http.Error(w, `{"error":"JSON required"}`, 415)
+		http.Error(w, `{"error":"JSON required"}`, http.StatusUnsupportedMediaType)
 		return
 	}
 	var input struct {
@@ -63,20 +63,20 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(http.MaxBytesReader(w, r.Body, 1024))
 	decoder.DisallowUnknownFields()
 	if err := decoder.Decode(&input); err != nil {
-		http.Error(w, `{"error":"invalid address query"}`, 400)
+		http.Error(w, `{"error":"invalid address query"}`, http.StatusBadRequest)
 		return
 	}
 	if decoder.Decode(&struct{}{}) != io.EOF {
-		http.Error(w, `{"error":"invalid address query"}`, 400)
+		http.Error(w, `{"error":"invalid address query"}`, http.StatusBadRequest)
 		return
 	}
 	input.Text = strings.TrimSpace(input.Text)
 	if len(input.Text) < 4 || !clean(input.Text, 200) {
-		http.Error(w, `{"error":"enter 4-200 address characters"}`, 400)
+		http.Error(w, `{"error":"enter 4-200 address characters"}`, http.StatusBadRequest)
 		return
 	}
 	if h.key == "" {
-		http.Error(w, `{"error":"suggestions not configured; enter address manually"}`, 503)
+		http.Error(w, `{"error":"suggestions not configured; enter address manually"}`, http.StatusServiceUnavailable)
 		return
 	}
 	h.mu.Lock()
@@ -91,23 +91,23 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	h.mu.Unlock()
 	if limited {
 		w.Header().Set("Retry-After", "60")
-		http.Error(w, `{"error":"try again later or enter manually"}`, 429)
+		http.Error(w, `{"error":"try again later or enter manually"}`, http.StatusTooManyRequests)
 		return
 	}
 	query := url.Values{"text": {input.Text}, "format": {"json"}, "limit": {"5"}, "apiKey": {h.key}}
 	request, err := http.NewRequestWithContext(r.Context(), "GET", h.endpoint+"?"+query.Encode(), nil)
 	if err != nil {
-		http.Error(w, `{"error":"suggestions unavailable"}`, 502)
+		http.Error(w, `{"error":"suggestions unavailable"}`, http.StatusBadGateway)
 		return
 	}
 	response, err := h.client.Do(request)
 	if err != nil {
-		http.Error(w, `{"error":"suggestions unavailable"}`, 502)
+		http.Error(w, `{"error":"suggestions unavailable"}`, http.StatusBadGateway)
 		return
 	}
 	defer func() { _ = response.Body.Close() }()
 	if response.StatusCode != http.StatusOK {
-		http.Error(w, `{"error":"suggestions unavailable"}`, 502)
+		http.Error(w, `{"error":"suggestions unavailable"}`, http.StatusBadGateway)
 		return
 	}
 	var data struct {
@@ -122,7 +122,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		} `json:"results"`
 	}
 	if json.NewDecoder(io.LimitReader(response.Body, 65536)).Decode(&data) != nil {
-		http.Error(w, `{"error":"suggestions unavailable"}`, 502)
+		http.Error(w, `{"error":"suggestions unavailable"}`, http.StatusBadGateway)
 		return
 	}
 	items := make([]suggestion, 0, 5)
