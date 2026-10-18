@@ -3,5 +3,5 @@ package cqassets
 
 import "embed"
 
-//go:embed extension/address.mjs
+//go:embed extension/address.mjs extension/vault.mjs
 var Files embed.FS

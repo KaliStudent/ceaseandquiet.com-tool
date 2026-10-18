@@ -86,3 +86,19 @@ details li { margin: 14px 0; }
   dl { grid-template-columns: 1fr; gap: 5px; } dd { margin-bottom: 10px; }
 }
 @media(prefers-reduced-motion:reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }
+
+.address-field { grid-column: 1 / -1; min-width: 0; }
+.address-field .address-opt-in { margin-top: 12px; }
+.address-field .address-results { margin-bottom: 8px; }
+
+.website-vault { border-top: 1px solid #2e3440; margin: 24px 0; padding-top: 20px; }
+.website-vault input { max-width: 560px; }
+.profile-actions { justify-content: flex-start; margin: 20px 0 12px; }
+
+.bot-panel { margin-bottom: 20px; }
+.email-verification { grid-column: 1 / -1; border: 1px solid #2e3440; border-radius: 8px; padding: 16px; display: flex; flex-wrap: wrap; align-items: end; gap: 12px; }
+.email-verification label { flex: 1; min-width: 160px; }
+.email-verification p { flex-basis: 100%; margin: 0; }
+.honeypot { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+
+input[type=date] { color-scheme: dark; }

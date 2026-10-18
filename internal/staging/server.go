@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/drumandbytes/eraser/internal/preview"
+	"github.com/drumandbytes/eraser/internal/webguard"
 )
 
 // New requires one explicit public hostname and port. It exposes no sender or
@@ -26,7 +27,7 @@ func New(host, username string, passwordHash [sha256.Size]byte) (http.Handler, e
 		return nil, err
 	}
 	userHash := sha256.Sum256([]byte(username))
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	return webguard.New().Wrap(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Cache-Control", "no-store")
 		w.Header().Set("Referrer-Policy", "no-referrer")
 		w.Header().Set("X-Content-Type-Options", "nosniff")
@@ -52,5 +53,5 @@ func New(host, username string, passwordHash [sha256.Size]byte) (http.Handler, e
 		local.Host = "127.0.0.1:8787"
 		local.Header.Del("Authorization")
 		app.ServeHTTP(w, local)
-	}), nil
+	})), nil
 }
