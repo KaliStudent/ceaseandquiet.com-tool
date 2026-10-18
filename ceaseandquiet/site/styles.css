@@ -86,3 +86,7 @@ details li { margin: 14px 0; }
   dl { grid-template-columns: 1fr; gap: 5px; } dd { margin-bottom: 10px; }
 }
 @media(prefers-reduced-motion:reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }
+
+.address-field { grid-column: 1 / -1; min-width: 0; }
+.address-field .address-opt-in { margin-top: 12px; }
+.address-field .address-results { margin-bottom: 8px; }
