@@ -8,6 +8,7 @@ export function attachWebsiteVault({form, controls, fields, encrypt, decrypt, st
   const clear = () => {
     fields.forEach(name => { input(name).value = ''; });
     controls.passphrase.value = ''; clearSuggestions();
+    form.dispatchEvent?.(new Event('profileclear'));
   };
   const render = () => {
     controls.mode.textContent = saved ? revealed ? 'PROFILE UNLOCKED' : 'ENCRYPTED PROFILE SAVED · LOCKED' : 'CREATE YOUR WEBSITE PROFILE';
@@ -52,6 +53,7 @@ export function attachWebsiteVault({form, controls, fields, encrypt, decrypt, st
       const profile = await decrypt(JSON.parse(raw), passphrase);
       if (current !== generation) return;
       fields.forEach(name => { input(name).value = profile[name]; });
+      form.dispatchEvent?.(new Event('profilechange'));
       revealed = true; deadline = now() + 120000; render();
       timer = setTimer(() => lock('Profile locked after two minutes.'), 120000);
       say('Profile unlocked for two minutes. Edit details here, then enter your passphrase to save changes. Nothing has been sent.');

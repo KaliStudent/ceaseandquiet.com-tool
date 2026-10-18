@@ -48,10 +48,13 @@
       <div class="panel preview-panel">
         <div class="notice"><strong>Practice with sample details.</strong> This local form never submits. Values clear when you leave the page or after two minutes.</div>
         <form id="cq-demo-form" data-cq-preview="v1" autocomplete="off">
+          <div class="bot-panel"><div id="bot-check"></div><p id="bot-status" class="subtle" role="status">Loading bot protection…</p></div>
+          <div class="honeypot" aria-hidden="true"><label>Leave this field empty<input name="website" tabindex="-1" autocomplete="off"></label></div>
           <div class="form-grid">
             <label>First name<input name="givenName" maxlength="100" autocomplete="off" spellcheck="false"></label>
             <label>Last name<input name="familyName" maxlength="100" autocomplete="off" spellcheck="false"></label>
             <label>Email<input name="email" type="email" maxlength="254" autocomplete="off" spellcheck="false"></label>
+            <section class="email-verification" aria-label="Email verification"><button id="email-send-code" class="glow-button secondary" type="button" disabled>Send verification code</button><label for="email-code">Email verification code<input id="email-code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}"></label><button id="email-confirm-code" class="glow-button secondary" type="button" disabled>Confirm email</button><p id="email-verification-status" class="subtle" role="status">Email not verified.</p></section>
             <div class="address-field"><label>Street address<input name="address" maxlength="200" autocomplete="off" spellcheck="false" placeholder="Start typing your street address" aria-describedby="address-status" aria-controls="address-results"></label>
           <label class="address-opt-in"><input id="address-enabled" type="checkbox" checked> Enable address suggestions</label>
           <p id="address-status" class="subtle" role="status">Address suggestions are on. Type at least four characters, then choose a result below. Geoapify receives only the address text.</p>
