@@ -71,7 +71,7 @@ form.addEventListener('input', () => {
   formStatus.textContent = 'Details are only in this page. They clear after two minutes.';
 });
 form.addEventListener('reset', () => {
-  clearTimeout(clearTimer); suggestions.clear(); document.querySelector('#address-enabled').checked = false; document.querySelector('#address-status').textContent = 'Address suggestions off. Enter the address manually.'; formStatus.textContent = 'Form cleared. Nothing was submitted.';
+  clearTimeout(clearTimer); suggestions.clear(); document.querySelector('#address-status').textContent = 'Suggestions are enabled. Geoapify receives the partial address you type. Manual entry always works.'; formStatus.textContent = 'Form cleared. Nothing was submitted.';
 });
 window.addEventListener('pagehide', clearForm);
 window.addEventListener('pageshow', event => { if (event.persisted) clearForm(); });
