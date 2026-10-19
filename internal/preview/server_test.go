@@ -16,6 +16,14 @@ func TestPreviewBoundaries(t *testing.T) {
 		status             int
 	}{
 		{"GET", "/", "127.0.0.1:8787", 200},
+		{"GET", "/privacy-scan/", "127.0.0.1:8787", 200},
+		{"GET", "/consumer-protection/", "127.0.0.1:8787", 200},
+		{"GET", "/privacy-scan", "127.0.0.1:8787", 308},
+		{"GET", "/consumer-protection/unknown", "127.0.0.1:8787", 404},
+		{"GET", "/privacy-scan/?email=synthetic", "127.0.0.1:8787", 400},
+		{"GET", "/api/v1/privacy-scan/status", "127.0.0.1:8787", 200},
+		{"GET", "/scan-workflow.mjs", "127.0.0.1:8787", 200},
+		{"GET", "/affiliate-links.json", "127.0.0.1:8787", 200},
 		{"HEAD", "/styles.css", "127.0.0.1:8787", 200},
 		{"GET", "/site.js", "127.0.0.1:8787", 200},
 		{"GET", "/address.mjs", "127.0.0.1:8787", 200},

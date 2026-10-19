@@ -94,7 +94,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, `{"error":"try again later or enter manually"}`, http.StatusTooManyRequests)
 		return
 	}
-	query := url.Values{"text": {input.Text}, "format": {"json"}, "limit": {"5"}, "apiKey": {h.key}}
+	query := url.Values{"text": {input.Text}, "format": {"json"}, "limit": {"5"}, "apiKey": {h.key}, "filter": {"countrycode:us"}}
 	request, err := http.NewRequestWithContext(r.Context(), "GET", h.endpoint+"?"+query.Encode(), nil)
 	if err != nil {
 		http.Error(w, `{"error":"suggestions unavailable"}`, http.StatusBadGateway)
@@ -119,6 +119,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			State       string `json:"state"`
 			StateCode   string `json:"state_code"`
 			Postcode    string `json:"postcode"`
+			CountryCode string `json:"country_code"`
 		} `json:"results"`
 	}
 	if json.NewDecoder(io.LimitReader(response.Body, 65536)).Decode(&data) != nil {
@@ -127,6 +128,9 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	items := make([]suggestion, 0, 5)
 	for _, result := range data.Results {
+		if strings.ToLower(result.CountryCode) != "us" {
+			continue
+		}
 		state := result.StateCode
 		if state == "" {
 			state = result.State

@@ -12,7 +12,7 @@ export function attachWebsiteVault({form, controls, fields, encrypt, decrypt, st
   };
   const render = () => {
     controls.mode.textContent = saved ? revealed ? 'PROFILE UNLOCKED' : 'ENCRYPTED PROFILE SAVED · LOCKED' : 'CREATE YOUR WEBSITE PROFILE';
-    for (const name of fields) input(name).readOnly = busy || (saved && !revealed);
+    for (const name of fields) { input(name).readOnly = busy || (saved && !revealed); if(input(name).tagName==='SELECT')input(name).disabled=busy||(saved&&!revealed); }
     controls.save.disabled = !available || busy || (saved && !revealed);
     controls.save.textContent = saved ? 'Encrypt and save changes' : 'Encrypt and save profile';
     controls.unlock.hidden = !saved || revealed;
@@ -68,7 +68,7 @@ export function attachWebsiteVault({form, controls, fields, encrypt, decrypt, st
   }));
   form.addEventListener('reset', () => lock('Form cleared. Any encrypted saved profile remains locked.'));
   win.addEventListener('pagehide', () => lock());
-  doc.addEventListener('visibilitychange', () => { if (doc.hidden) lock(); });
+  doc.addEventListener('visibilitychange', () => { if (doc.hidden) { if(saved||revealed||busy)lock(); else {controls.passphrase.value='';clearSuggestions();} } });
   win.addEventListener('focus', () => { if (revealed && now() >= deadline) lock('Profile locked after two minutes.'); });
   win.addEventListener('storage', event => {
     if (event.key !== key && event.key !== null) return;

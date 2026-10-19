@@ -22,10 +22,10 @@ func query(h *Handler, method, origin, body string) *httptest.ResponseRecorder {
 func TestNormalizeSuggestionsAndLimitProviderInput(t *testing.T) {
 	provider := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		q := r.URL.Query()
-		if len(q) != 4 || q.Get("text") != "100 Exam" || q.Get("apiKey") != "synthetic-key" || q.Get("limit") != "5" {
+		if len(q) != 5 || q.Get("text") != "100 Exam" || q.Get("apiKey") != "synthetic-key" || q.Get("limit") != "5" || q.Get("filter") != "countrycode:us" {
 			t.Error("unexpected provider input")
 		}
-		_, _ = io.WriteString(w, `{"results":[{"formatted":"100 Example Street, Example City, TS 00000","housenumber":"100","street":"Example Street","city":"Example City","state_code":"TS","postcode":"00000","lat":1,"lon":2,"private":"omitted"}]}`)
+		_, _ = io.WriteString(w, `{"results":[{"formatted":"100 Example Street, Example City, TS 00000","housenumber":"100","street":"Example Street","city":"Example City","state_code":"TS","postcode":"00000","country_code":"us","lat":1,"lon":2,"private":"omitted"},{"formatted":"Foreign address","street":"Foreign street","country_code":"ca"}]}`)
 	}))
 	defer provider.Close()
 	h := New("synthetic-key")
