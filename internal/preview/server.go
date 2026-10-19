@@ -14,6 +14,8 @@ import (
 	previewsite "github.com/drumandbytes/eraser/ceaseandquiet/site"
 	"github.com/drumandbytes/eraser/internal/addressapi"
 	"github.com/drumandbytes/eraser/internal/formsecurity"
+	"github.com/drumandbytes/eraser/internal/privacynews"
+	"github.com/drumandbytes/eraser/internal/privacyscan"
 	"github.com/drumandbytes/eraser/internal/readonlyapi"
 )
 
@@ -30,8 +32,12 @@ func New(addr string) (http.Handler, error) {
 	formSecurity := formsecurity.FromEnvironment()
 	mux.Handle("/api/v1/form-security/", formSecurity)
 	mux.Handle("/api/", api.Handler())
+	mux.Handle("/api/v1/privacy-news", privacynews.New())
+	scan := &privacyscan.Handler{Auth: formSecurity}
+	mux.Handle("/api/v1/privacy-scan", scan)
+	mux.Handle("/api/v1/privacy-scan/status", scan)
 	mux.Handle("/api/v1/address-suggestions", formSecurity.ProtectAddress(addressapi.New(os.Getenv("CQ_GEOAPIFY_API_KEY"))))
-	for _, name := range []string{"index.html", "styles.css", "site.js", "address.mjs", "form-tools.mjs", "vault.mjs", "profile-vault.mjs", "form-security.mjs"} {
+	for _, name := range []string{"index.html", "privacy-scan.html", "consumer-protection.html", "styles.css", "site.js", "home.js", "scan.js", "consumer.js", "affiliate-links.json", "scan-workflow.mjs", "address.mjs", "form-tools.mjs", "vault.mjs", "profile-vault.mjs", "form-security.mjs"} {
 		var content []byte
 		var err error
 		if name == "address.mjs" || name == "vault.mjs" {
@@ -46,6 +52,12 @@ func New(addr string) (http.Handler, error) {
 		if name == "index.html" {
 			path = "/"
 		}
+		if name == "privacy-scan.html" {
+			path = "/privacy-scan/"
+		}
+		if name == "consumer-protection.html" {
+			path = "/consumer-protection/"
+		}
 		mux.HandleFunc(path, func(w http.ResponseWriter, r *http.Request) {
 			if r.URL.Path != path {
 				http.NotFound(w, r)
@@ -56,6 +68,15 @@ func New(addr string) (http.Handler, error) {
 				return
 			}
 			http.ServeContent(w, r, name, time.Time{}, bytes.NewReader(content))
+		})
+	}
+	for _, path := range []string{"/privacy-scan", "/consumer-protection"} {
+		mux.HandleFunc(path, func(w http.ResponseWriter, r *http.Request) {
+			if r.URL.RawQuery != "" {
+				http.Error(w, "unexpected query", http.StatusBadRequest)
+				return
+			}
+			http.Redirect(w, r, path+"/", http.StatusPermanentRedirect)
 		})
 	}
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -74,7 +95,8 @@ func New(addr string) (http.Handler, error) {
 		}
 		addressLookup := r.URL.Path == "/api/v1/address-suggestions" && r.Method == http.MethodPost
 		securityAction := strings.HasPrefix(r.URL.Path, "/api/v1/form-security/") && r.Method == http.MethodPost
-		if r.Method != http.MethodGet && r.Method != http.MethodHead && !addressLookup && !securityAction {
+		scanSubmission := r.URL.Path == "/api/v1/privacy-scan" && r.Method == http.MethodPost
+		if r.Method != http.MethodGet && r.Method != http.MethodHead && !addressLookup && !securityAction && !scanSubmission {
 			w.Header().Set("Allow", "GET, HEAD")
 			http.Error(w, "read-only preview", http.StatusMethodNotAllowed)
 			return
